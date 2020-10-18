@@ -1444,7 +1444,7 @@ span[data-link-title^='I am grateful for...'] .rm-page-ref {
 }
 
 span[data-link-title^='I am grateful for...'] .rm-page-ref::before {
-    content: "🙏  "
+    content: "🙏 "
 }
 
 span[data-link-title^='What would make today great?'] .rm-page-ref {
@@ -1454,7 +1454,7 @@ span[data-link-title^='What would make today great?'] .rm-page-ref {
 }
 
 span[data-link-title^='What would make today great?'] .rm-page-ref::before {
-    content: "🙌  "
+    content: "🙌 "
 }
 
 span[data-link-title^='Daily Affirmation'] .rm-page-ref {
@@ -1464,7 +1464,7 @@ span[data-link-title^='Daily Affirmation'] .rm-page-ref {
 }
 
 span[data-link-title^='Daily Affirmation'] .rm-page-ref::before {
-    content: "👊  "
+    content: "👊 "
 }
 
 /* currency tags */
