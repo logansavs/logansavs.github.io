@@ -627,11 +627,10 @@ span.bp3-button.bp3-minimal.bp3-small.bp3-icon-more::before {
 
 .rm-reference-item,
 .rm-embed-container {
-    background: #b3b3b310 !important;
+    background: #b3b3b300 !important;
     border-radius: 5px !important;
     padding: 2px 10px 2px 2px !important;
-    border: 1px solid #b3b3b3;
-    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.02);
+    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.7), 0px 4px 7px -1px rgba(0, 0, 0, 0.07) !important;
 }
 
 .rm-embed-inner-block-hide {
@@ -1305,27 +1304,28 @@ bp3-toast-message {
 /* all data tags */
 
 .rm-page-ref-tag {
-    background-color: #106aa2;
-    color: #ffffff !important;
-    border-radius: 4px;
-    padding: 2px 6px;
-    line-height: 0em;
-    font-size: 10px;
-    font-weight: 500;
-    border: none;
-	  margin-right: 3px;
-}
-
-.rm-page-ref-tag:hover {
-    opacity: 0.7;
-    background-color: #106aa2;
-    color: #ffffff !important;
+    background-color: #106aa200;
+    color: #106aa2 !important;
     border-radius: 4px;
     padding: 2px 6px !important;
     line-height: 0em;
     font-size: 10px;
     font-weight: 500;
-    border: none;
+    border: 1px solid #106aa2;
+    margin-left: 0px !important;
+    margin-right: 3px !important;
+}
+
+.rm-page-ref-tag:hover {
+    opacity: 0.7;
+    background-color: #106aa200;
+    color: #106aa2 !important;
+    border-radius: 4px;
+    padding: 2px 6px !important;
+    line-height: 0em;
+    font-size: 10px;
+    font-weight: 500;
+    border: 1px solid #106aa2;
     margin-left: 0px !important;
     margin-right: 3px !important;
 }
@@ -1335,51 +1335,61 @@ bp3-toast-message {
 span.rm-page-ref[data-tag="Complete"] {
     background-color: #00c80515 !important;
     color: #00c805 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Not Started"] {
     background-color: #ff555515 !important;
     color: #ff5555 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="In Progress"] {
     background-color: #f2d02415 !important;
     color: #f2d024 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Scheduled"] {
     background-color: #F2812C15 !important;
     color: #F2812C !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Incomplete"] {
     background-color: #ff555515 !important;
     color: #ff5555 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Tentative"] {
     background-color: #f2d02415 !important;
     color: #f2d024 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Planning"] {
     background-color: #f2d02415 !important;
     color: #f2d024 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Booked"] {
     background-color: #5A31F415 !important;
     color: #5A31F4 !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Twitter"] {
     background-color: #1da1f2;
     color: #fff !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Reddit"] {
     background-color: #ff7f4f;
     color: #fff !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Inbox"] {
@@ -1390,11 +1400,13 @@ span.rm-page-ref[data-tag="Inbox"] {
 span.rm-page-ref[data-tag="Articles"] {
     background-color: #55a372;
     color: #fff !important;
+    border: none;
 }
 
 span.rm-page-ref[data-tag="Books"] {
     background-color: #6755a3;
     color: #fff !important;
+    border: none;
 }
 
 /* shipping update tags */
