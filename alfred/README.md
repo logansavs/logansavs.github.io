@@ -27,8 +27,8 @@ you the rest of the way:
 - **Features → Universal Actions**: Raycast opens its Actions panel with `⌘K`.
   Alfred's equivalent is the result action panel (`→` or `⌘`-return by
   default). Set it to a key you'll remember.
-- Pair it with the "Light" or "Dark" theme to follow macOS: Appearance →
-  Options lets you use a different theme for Light and Dark mode.
+- To follow macOS light/dark mode, install both: Appearance →
+  Options lets you pick a separate theme for each mode.
 
 ## Limits
 
