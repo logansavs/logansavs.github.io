@@ -1,60 +1,64 @@
 {
   "alfredtheme" : {
     "result" : {
-      "textSpacing" : 2,
+      "textSpacing" : 12,
       "subtext" : {
         "size" : 12,
-        "colorSelected" : "#7A7A7AFF",
+        "colorSelected" : "#0000007A",
         "font" : "System",
-        "color" : "#8A8A8AFF"
+        "color" : "#0000007A"
       },
       "shortcut" : {
-        "size" : 13,
-        "colorSelected" : "#6E6E73FF",
+        "size" : 14,
+        "colorSelected" : "#00000080",
         "font" : "System",
-        "color" : "#8A8A8AFF"
+        "color" : "#00000073"
       },
-      "backgroundSelected" : "#0000001A",
+      "backgroundSelected" : "#00000014",
       "text" : {
         "size" : 15,
         "colorSelected" : "#1D1D1FFF",
         "font" : "System",
         "color" : "#1D1D1FFF"
       },
-      "iconPaddingHorizontal" : 10,
+      "iconPaddingHorizontal" : 8,
+      "roundness" : 10,
       "paddingVertical" : 7,
-      "iconSize" : 26
+      "iconSize" : 24
     },
     "search" : {
       "backgroundSelected" : "#0A84FF40",
-      "paddingVertical" : 8,
-      "background" : "#00000000",
+      "paddingHorizontal" : 8,
       "spacing" : 10,
       "text" : {
         "size" : 21,
         "colorSelected" : "#1D1D1FFF",
         "font" : "System",
         "color" : "#1D1D1FFF"
-      }
+      },
+      "background" : "#FFFFFF00",
+      "roundness" : 10,
+      "paddingVertical" : 10
     },
     "window" : {
-      "color" : "#E9E9E9E6",
+      "color" : "#EDEDED66",
       "paddingHorizontal" : 8,
       "width" : 750,
-      "borderPadding" : 8,
-      "borderColor" : "#0000001F",
-      "blur" : 40,
-      "roundness" : 18,
+      "borderPadding" : 0,
+      "borderColor" : "#00000026",
+      "blur" : 0,
+      "roundness" : 26,
       "paddingVertical" : 8
     },
-    "credit" : "Logan Savage",
+    "credit" : "Logan Savage, based on Frosty Glass by Jinseon Yoo",
+    "visualEffectMode" : 1,
     "separator" : {
-      "color" : "#00000014",
-      "thickness" : 1
+      "color" : "#00000000",
+      "thickness" : 0
     },
     "scrollbar" : {
-      "color" : "#00000033",
-      "thickness" : 3
+      "color" : "#0000001F",
+      "thickness" : 5
     },
     "name" : "Raycast Light"
   }

@@ -1,13 +1,16 @@
 # Raycast themes for Alfred
 
-Two Alfred 5 themes modeled on Raycast's launcher: a flat, frosted panel,
-a borderless search field with a hairline divider, compact single-line rows,
-and a soft gray pill for the selected result (no accent-colored highlight).
+Two Alfred 5 themes modeled on Raycast's launcher, built on Jinseon Yoo's
+Frosty Glass theme. Like Frosty Glass, they use macOS's native frosted-glass
+material (`visualEffectMode`) instead of a flat color, then apply Raycast's
+proportions: a 750pt-wide window with large rounded corners, a borderless
+search field in SF Pro, compact rows with small icons, and a rounded gray pill
+for the selected result. Text stays dark on selection, as it does in Raycast.
 
 | File | Look |
 | --- | --- |
-| `Raycast Light.alfredappearance` | Light gray frosted glass, near-black text |
-| `Raycast Dark.alfredappearance`  | Dark graphite glass, off-white text |
+| `Raycast Light.alfredappearance` | Light frosted glass (light material), near-black text |
+| `Raycast Dark.alfredappearance`  | Dark frosted glass (dark material), off-white text |
 
 ## Install
 
