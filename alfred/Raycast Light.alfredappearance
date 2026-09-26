@@ -1,64 +1,64 @@
 {
   "alfredtheme" : {
     "result" : {
-      "textSpacing" : 12,
+      "textSpacing" : 5,
       "subtext" : {
-        "size" : 12,
-        "colorSelected" : "#0000007A",
+        "size" : 10,
+        "colorSelected" : "#00000066",
         "font" : "System",
-        "color" : "#0000007A"
+        "color" : "#00000066"
       },
       "shortcut" : {
-        "size" : 14,
-        "colorSelected" : "#00000080",
+        "size" : 16,
+        "colorSelected" : "#FFFFFFFF",
         "font" : "System",
-        "color" : "#00000073"
+        "color" : "#55607FE4"
       },
-      "backgroundSelected" : "#00000014",
+      "backgroundSelected" : "#00000019",
       "text" : {
         "size" : 15,
-        "colorSelected" : "#1D1D1FFF",
+        "colorSelected" : "#000000FF",
         "font" : "System",
-        "color" : "#1D1D1FFF"
+        "color" : "#000000E4"
       },
-      "iconPaddingHorizontal" : 8,
-      "roundness" : 10,
-      "paddingVertical" : 7,
-      "iconSize" : 24
+      "iconPaddingHorizontal" : 10,
+      "roundness" : 8,
+      "paddingVertical" : 5,
+      "iconSize" : 19
     },
     "search" : {
-      "backgroundSelected" : "#0A84FF40",
-      "paddingHorizontal" : 8,
-      "spacing" : 10,
+      "backgroundSelected" : "#A7C4E8FF",
+      "paddingHorizontal" : 7,
+      "spacing" : 9,
       "text" : {
-        "size" : 21,
-        "colorSelected" : "#1D1D1FFF",
+        "size" : 20,
+        "colorSelected" : "#000000FF",
         "font" : "System",
-        "color" : "#1D1D1FFF"
+        "color" : "#000000FF"
       },
-      "background" : "#FFFFFF00",
-      "roundness" : 10,
-      "paddingVertical" : 10
+      "background" : "#F8F8F800",
+      "roundness" : 8,
+      "paddingVertical" : 6
     },
     "window" : {
-      "color" : "#EDEDED66",
-      "paddingHorizontal" : 8,
-      "width" : 750,
+      "color" : "#F8F8F86B",
+      "paddingHorizontal" : 5,
+      "width" : 700,
       "borderPadding" : 0,
-      "borderColor" : "#00000026",
+      "borderColor" : "#0000007F",
       "blur" : 0,
-      "roundness" : 26,
-      "paddingVertical" : 8
+      "roundness" : 10,
+      "paddingVertical" : 5
     },
-    "credit" : "Logan Savage, based on Frosty Glass by Jinseon Yoo",
+    "credit" : "Signynt",
     "visualEffectMode" : 1,
     "separator" : {
-      "color" : "#00000000",
+      "color" : "#CBCBCBF3",
       "thickness" : 0
     },
     "scrollbar" : {
-      "color" : "#0000001F",
-      "thickness" : 5
+      "color" : "#3B465F71",
+      "thickness" : 4
     },
     "name" : "Raycast Light"
   }

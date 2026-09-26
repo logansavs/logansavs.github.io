@@ -1,40 +1,22 @@
-# Raycast themes for Alfred
+# Raycast Light for Alfred
 
-Two Alfred 5 themes modeled on Raycast's launcher, built on Jinseon Yoo's
-Frosty Glass theme. Like Frosty Glass, they use macOS's native frosted-glass
-material (`visualEffectMode`) instead of a flat color, then apply Raycast's
-proportions: a 750pt-wide window with large rounded corners, a borderless
-search field in SF Pro, compact rows with small icons, and a rounded gray pill
-for the selected result. Text stays dark on selection, as it does in Raycast.
+An Alfred 5 theme modeled on Raycast's launcher, by Signynt, originally
+published on [Packal](https://www.packal.org/theme/raycast-light). Packal is
+archived, so this copy is kept here.
 
-| File | Look |
-| --- | --- |
-| `Raycast Light.alfredappearance` | Light frosted glass (light material), near-black text |
-| `Raycast Dark.alfredappearance`  | Dark frosted glass (dark material), off-white text |
+- Native macOS frosted glass (light material) with a soft off-white tint
+- 700pt-wide window, 10pt corners, borderless search field
+- Compact rows: 19pt icons, 15pt system font, small gray subtext
+- Rounded gray pill (8pt corners) for the selected result
 
 ## Install
 
-1. Download a `.alfredappearance` file and double-click it. Alfred opens
-   **Preferences → Appearance** and adds the theme to the list.
-2. Select it.
+Download `Raycast Light.alfredappearance` and double-click it. Alfred opens
+**Preferences → Appearance** with the theme added; select it.
 
 ## Match Raycast more closely
 
-A theme only controls colors, fonts, and spacing. These Alfred settings get
-you the rest of the way:
-
-- **Appearance → Options**: hide the hat and the menu icon, and hide result
-  shortcuts (Raycast doesn't show `⌘1`–`⌘9`).
-- **Appearance → Options**: hide subtext if you want single-line rows like
-  Raycast's.
-- **Features → Universal Actions**: Raycast opens its Actions panel with `⌘K`.
-  Alfred's equivalent is the result action panel (`→` or `⌘`-return by
-  default). Set it to a key you'll remember.
-- To follow macOS light/dark mode, install both: Appearance →
-  Options lets you pick a separate theme for each mode.
-
-## Limits
-
-Alfred has no persistent action bar at the bottom of the window, no
-"Results" section header, and no right-aligned type label ("Application",
-"Command"). Those parts of Raycast can't be reproduced with a theme.
+A theme only controls colors, fonts, and spacing. In **Appearance → Options**
+you can also hide the hat, the menu icon, and the `⌘1`–`⌘9` result shortcuts.
+Raycast's bottom action bar, "Results" header, and right-aligned type labels
+can't be reproduced with an Alfred theme.
