@@ -1,0 +1,61 @@
+{
+  "alfredtheme" : {
+    "result" : {
+      "textSpacing" : 2,
+      "subtext" : {
+        "size" : 12,
+        "colorSelected" : "#A1A1A6FF",
+        "font" : "System",
+        "color" : "#8E8E93FF"
+      },
+      "shortcut" : {
+        "size" : 13,
+        "colorSelected" : "#AEAEB2FF",
+        "font" : "System",
+        "color" : "#8E8E93FF"
+      },
+      "backgroundSelected" : "#FFFFFF1A",
+      "text" : {
+        "size" : 15,
+        "colorSelected" : "#F5F5F7FF",
+        "font" : "System",
+        "color" : "#F5F5F7FF"
+      },
+      "iconPaddingHorizontal" : 10,
+      "paddingVertical" : 7,
+      "iconSize" : 26
+    },
+    "search" : {
+      "backgroundSelected" : "#0A84FF59",
+      "paddingVertical" : 8,
+      "background" : "#00000000",
+      "spacing" : 10,
+      "text" : {
+        "size" : 21,
+        "colorSelected" : "#F5F5F7FF",
+        "font" : "System",
+        "color" : "#F5F5F7FF"
+      }
+    },
+    "window" : {
+      "color" : "#1C1C1EE6",
+      "paddingHorizontal" : 8,
+      "width" : 750,
+      "borderPadding" : 8,
+      "borderColor" : "#FFFFFF26",
+      "blur" : 40,
+      "roundness" : 18,
+      "paddingVertical" : 8
+    },
+    "credit" : "Logan Savage",
+    "separator" : {
+      "color" : "#FFFFFF14",
+      "thickness" : 1
+    },
+    "scrollbar" : {
+      "color" : "#FFFFFF33",
+      "thickness" : 3
+    },
+    "name" : "Raycast Dark"
+  }
+}
