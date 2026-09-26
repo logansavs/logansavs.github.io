@@ -9,22 +9,22 @@
         "color" : "#00000066"
       },
       "shortcut" : {
-        "size" : 16,
+        "size" : 14,
         "colorSelected" : "#FFFFFFFF",
         "font" : "System",
-        "color" : "#55607FE4"
+        "color" : "#565154E2"
       },
       "backgroundSelected" : "#00000019",
       "text" : {
-        "size" : 15,
+        "size" : 14,
         "colorSelected" : "#000000FF",
         "font" : "System",
         "color" : "#000000E4"
       },
-      "iconPaddingHorizontal" : 10,
-      "roundness" : 8,
-      "paddingVertical" : 5,
-      "iconSize" : 19
+      "iconPaddingHorizontal" : 12,
+      "roundness" : 12,
+      "paddingVertical" : 6,
+      "iconSize" : 28
     },
     "search" : {
       "backgroundSelected" : "#A7C4E8FF",
@@ -38,17 +38,17 @@
       },
       "background" : "#F8F8F800",
       "roundness" : 8,
-      "paddingVertical" : 6
+      "paddingVertical" : 10
     },
     "window" : {
       "color" : "#F8F8F86B",
-      "paddingHorizontal" : 5,
+      "paddingHorizontal" : 10,
       "width" : 700,
       "borderPadding" : 0,
       "borderColor" : "#0000007F",
       "blur" : 0,
-      "roundness" : 10,
-      "paddingVertical" : 5
+      "roundness" : 24,
+      "paddingVertical" : 12
     },
     "credit" : "Signynt",
     "visualEffectMode" : 1,
