@@ -14,7 +14,7 @@
         "font" : "System",
         "color" : "#FFFFFFA5"
       },
-      "backgroundSelected" : "#7B89A630",
+      "backgroundSelected" : "#00000030",
       "text" : {
         "size" : 14,
         "colorSelected" : "#FFFFFFFF",
@@ -27,16 +27,16 @@
       "iconSize" : 30
     },
     "search" : {
-      "backgroundSelected" : "#A7C4E8FF",
+      "backgroundSelected" : "#00000066",
       "paddingHorizontal" : 7,
       "spacing" : 9,
       "text" : {
         "size" : 20,
-        "colorSelected" : "#000000FF",
+        "colorSelected" : "#FFFFFFFF",
         "font" : "System",
         "color" : "#FFFFFFFF"
       },
-      "background" : "#7B89A600",
+      "background" : "#00000000",
       "roundness" : 8,
       "paddingVertical" : 10
     },
@@ -57,8 +57,8 @@
       "thickness" : 0
     },
     "scrollbar" : {
-      "color" : "#3B465F71",
-      "thickness" : 4
+      "color" : "#00000059",
+      "thickness" : 6
     },
     "name" : "Raycast Dark"
   }

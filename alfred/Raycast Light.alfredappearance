@@ -27,7 +27,7 @@
       "iconSize" : 30
     },
     "search" : {
-      "backgroundSelected" : "#A7C4E8FF",
+      "backgroundSelected" : "#00000026",
       "paddingHorizontal" : 7,
       "spacing" : 9,
       "text" : {
@@ -57,8 +57,8 @@
       "thickness" : 0
     },
     "scrollbar" : {
-      "color" : "#3B465F71",
-      "thickness" : 4
+      "color" : "#00000059",
+      "thickness" : 6
     },
     "name" : "Raycast Light"
   }
