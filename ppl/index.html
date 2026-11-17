@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PPL Log">
+<meta name="robots" content="noindex, nofollow">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<meta name="theme-color" content="#E8EBEE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
+<title>PPL Logbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EBEE; --surface:#FFFFFF; --surface-2:#F3F5F7; --ink:#15181C; --muted:#5B636D; --line:#D3D8DE; --line-2:#BFC6CE;
+  --p1:#1F5BD8; --p2:#CF3829; --p3:#D79A00; --on-ph:#FFFFFF; --on-p3:#2B2000;
+  --ok:#17834F; --ok-soft:#E1F2E8; --warn-soft:#FFF3D6; --warn-ink:#6B4B00;
+  --l2:#7A8590;
+  --shadow:0 1px 0 rgba(20,24,28,.06);
+  --cond:"Barlow Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417; --surface:#1B1F24; --surface-2:#22272D; --ink:#EDF0F3; --muted:#9AA3AD; --line:#2B3138; --line-2:#3A424B;
+    --p1:#5A8BFF; --p2:#FF6352; --p3:#F4BE2C; --on-ph:#0E1013; --on-p3:#1E1600;
+    --ok:#3CC985; --ok-soft:#163626; --warn-soft:#3A2F12; --warn-ink:#F5D98A; --l2:#8C96A1;
+    --shadow:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417; --surface:#1B1F24; --surface-2:#22272D; --ink:#EDF0F3; --muted:#9AA3AD; --line:#2B3138; --line-2:#3A424B;
+  --p1:#5A8BFF; --p2:#FF6352; --p3:#F4BE2C; --on-ph:#0E1013; --on-p3:#1E1600;
+  --ok:#3CC985; --ok-soft:#163626; --warn-soft:#3A2F12; --warn-ink:#F5D98A; --l2:#8C96A1;
+  --shadow:none; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100vh;padding-bottom:96px;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--p1);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.brand{min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--cond);font-weight:800;font-size:22px;letter-spacing:.01em;margin:0;flex:1;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:600}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:none;border-radius:999px;padding:6px 14px;font-weight:600;font-size:15px;color:var(--muted);min-height:34px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;flex:none}
+.icon-btn svg{width:20px;height:20px}
+
+.banner{margin:14px 0 0;padding:10px 14px;border-radius:12px;background:var(--warn-soft);color:var(--warn-ink);font-size:15px}
+
+/* hero */
+.hero{margin:20px 0 8px;display:grid;grid-template-columns:14px 1fr;gap:16px;align-items:stretch}
+.hero-bar{border-radius:7px;background:var(--ph)}
+.hero-k{margin:0;color:var(--muted);font-weight:600;font-size:15px}
+.hero-day{font-family:var(--cond);font-weight:800;font-size:clamp(64px,19vw,104px);line-height:.88;margin:6px 0 8px;letter-spacing:-.01em}
+.hero-meta{margin:0 0 16px;color:var(--muted)}
+.hero-meta b{color:var(--ink);font-weight:600}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:0 22px;min-height:52px;font-weight:700;font-size:17px;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line-2)}
+.btn.small{min-height:40px;padding:0 14px;font-size:15px;border-radius:11px}
+.btn[disabled]{opacity:.45}
+
+/* plates */
+h2.sec{font-family:var(--cond);font-weight:700;font-size:26px;margin:28px 0 12px;line-height:1.1}
+.plates{display:grid;grid-template-columns:repeat(13,1fr);gap:4px;align-items:end}
+.plate{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.plate-body{width:100%;height:76px;border-radius:6px;background:color-mix(in srgb,var(--ph) 18%,var(--surface));position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--ph) 35%,transparent)}
+.plate.deload .plate-body{height:52px}
+.plate-fill{position:absolute;left:0;right:0;bottom:0;height:var(--fill);background:var(--ph);transition:height .35s ease}
+.plate-n{font-family:var(--cond);font-weight:700;font-size:15px;color:var(--muted)}
+.plate[aria-pressed="true"] .plate-body{outline:3px solid var(--ink);outline-offset:2px}
+.plate[aria-pressed="true"] .plate-n{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0;padding:0;list-style:none;font-size:14px;color:var(--muted)}
+.legend li{display:flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;background:var(--ph)}
+
+/* week panel */
+.week-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:28px 0 4px}
+.week-head h2{margin:0}
+.week-sub{color:var(--muted);font-size:15px;margin:0 0 12px}
+.note{border-left:4px solid var(--ph);background:var(--surface);padding:10px 14px;border-radius:0 10px 10px 0;font-size:15px;margin:0 0 12px}
+.days{display:flex;flex-direction:column}
+.day{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;margin-bottom:8px;box-shadow:var(--shadow)}
+.day-name{font-family:var(--cond);font-weight:700;font-size:28px;line-height:1;flex:1}
+.day-name small{display:block;font-family:var(--body);font-weight:500;font-size:14px;color:var(--muted);margin-top:4px}
+.who{display:flex;gap:6px}
+.who span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;border:2px solid var(--line-2);color:var(--muted)}
+.who span.half{border-color:var(--ph);color:var(--ink)}
+.who span.done{background:var(--ph);border-color:var(--ph);color:var(--on-ph)}
+.rest-div{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:4px 0 12px}
+.rest-div::before,.rest-div::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* workout */
+.back{display:inline-flex;align-items:center;gap:4px;margin:14px 0 0;border:0;background:none;padding:6px 0;color:var(--muted);font-weight:600;font-size:16px}
+.back svg{width:18px;height:18px}
+.w-head{display:grid;grid-template-columns:10px 1fr;gap:14px;margin:8px 0 6px}
+.w-head .hero-day{font-size:clamp(56px,16vw,88px);margin:0 0 6px}
+.w-meta{margin:0;color:var(--muted);font-size:15px}
+.prog{height:6px;border-radius:3px;background:var(--line);margin:16px 0 4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ph);border-radius:3px;transition:width .3s}
+.prog-l{font-size:14px;color:var(--muted);margin:0 0 8px}
+
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+.ex.ss-first{border-bottom-left-radius:4px;border-bottom-right-radius:4px;margin-bottom:0;border-bottom-style:dashed}
+.ex.ss-next{border-top-left-radius:4px;border-top-right-radius:4px;margin-top:0;border-top:0}
+.ex.complete{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.ex-top{display:flex;gap:12px;align-items:flex-start}
+.info-btn{flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line-2);background:none;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-weight:700;font-size:17px;color:var(--muted);display:grid;place-items:center}
+.info-btn[aria-expanded="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.info{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:var(--surface-2);font-size:15px;line-height:1.5}
+.info p{margin:0 0 8px}
+.info p:last-child{margin-bottom:0}
+.info .info-k{font-weight:700;color:var(--ink);margin:0 0 2px;font-size:14px}
+.info-pdf{color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:8px}
+.ex-num{font-family:var(--cond);font-weight:700;font-size:15px;color:var(--muted);min-width:22px;padding-top:4px}
+.ex.complete .ex-num{color:var(--ok)}
+.ex-name{font-family:var(--cond);font-weight:700;font-size:25px;line-height:1.05;margin:0;flex:1}
+.ss-tag{display:inline-block;font-family:var(--body);font-size:13px;font-weight:600;color:var(--ph);margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.chips li{background:var(--surface-2);border-radius:8px;padding:3px 9px;font-size:14px;color:var(--muted)}
+.chips li b{color:var(--ink);font-weight:600}
+.subs{display:flex;gap:6px;overflow-x:auto;margin:12px -16px 0;padding:0 16px 2px;scrollbar-width:none}
+.subs::-webkit-scrollbar{display:none}
+.subs button{flex:none;border:1px solid var(--line-2);background:none;border-radius:999px;padding:6px 12px;font-size:14px;font-weight:500;color:var(--muted);min-height:34px}
+.subs button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);font-weight:600;background:var(--surface-2)}
+.hint{margin:10px 0 0;font-size:14px;color:var(--muted)}
+.hint b{color:var(--ink);font-weight:600}
+.sets{width:100%;border-collapse:separate;border-spacing:0 6px;margin-top:8px}
+.sets th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:0 4px}
+.sets td{padding:0 3px}
+.sets td:first-child{width:36px;font-family:var(--cond);font-weight:700;font-size:18px;color:var(--muted);text-align:center}
+.sets td:last-child{width:56px}
+.num{width:100%;height:48px;border:1.5px solid var(--line-2);border-radius:11px;background:var(--surface-2);text-align:center;font-family:var(--cond);font-weight:700;font-size:22px;padding:0 4px;-moz-appearance:textfield}
+.num::placeholder{color:var(--muted);opacity:.55;font-weight:600}
+.num:focus{border-color:var(--ink);background:var(--surface);outline:none}
+.row-ok .num{border-color:color-mix(in srgb,var(--ok) 55%,var(--line-2));background:var(--ok-soft)}
+.row-ok td:first-child{color:var(--ok)}
+.tick{width:52px;height:48px;border-radius:11px;border:1.5px solid var(--line-2);background:none;display:grid;place-items:center;color:var(--muted)}
+.tick svg{width:24px;height:24px}
+.tick[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.hold-cell{font-size:15px;color:var(--muted);padding-left:6px}
+.ex-actions{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.link{border:0;background:none;padding:6px 0;color:var(--muted);font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2)}
+.rm{border:0;background:none;color:var(--muted);font-size:20px;width:52px;height:48px}
+textarea{width:100%;min-height:76px;border:1.5px solid var(--line-2);border-radius:12px;background:var(--surface-2);padding:10px 12px;font-size:17px;resize:vertical;margin-top:8px}
+textarea:focus{outline:none;border-color:var(--ink);background:var(--surface)}
+.finish{margin:24px 0 8px;display:flex;flex-direction:column;gap:12px}
+.finish .btn{width:100%}
+.done-note{display:flex;align-items:center;gap:10px;color:var(--ok);font-weight:600}
+
+/* progress */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat p{margin:0;color:var(--muted);font-size:14px}
+.stat strong{display:block;font-family:var(--cond);font-weight:800;font-size:40px;line-height:1;margin:6px 0 4px;color:var(--ink)}
+.stat strong small{font-size:20px;color:var(--muted);font-weight:600}
+label.f{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:22px 0 6px}
+select{width:100%;height:50px;border:1.5px solid var(--line-2);border-radius:12px;background:var(--surface);padding:0 12px;font-size:17px;font-weight:600}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 10px 8px;margin-top:12px}
+.chart svg{display:block;width:100%;height:auto}
+.chart-key{display:flex;gap:16px;font-size:14px;color:var(--muted);padding:0 6px 8px;flex-wrap:wrap}
+.chart-key span{display:flex;align-items:center;gap:6px}
+.chart-key i{width:18px;height:3px;border-radius:2px;display:inline-block}
+.hist{margin-top:14px;border-top:1px solid var(--line)}
+.hist-row{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:15px}
+.hist-row .wk{font-family:var(--cond);font-weight:700;font-size:17px}
+.hist-row .wk small{display:block;font-family:var(--body);font-weight:500;font-size:13px;color:var(--muted)}
+.hist-row p{margin:0}
+.hist-row p span{color:var(--muted)}
+.empty{background:var(--surface);border:1px dashed var(--line-2);border-radius:16px;padding:24px 18px;color:var(--muted);margin-top:18px}
+.empty b{color:var(--ink)}
+
+/* tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .wrap{display:flex;height:60px}
+.tabs a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:var(--muted);font-size:12px;font-weight:600}
+.tabs a svg{width:24px;height:24px}
+.tabs a[aria-current="page"]{color:var(--ink)}
+
+/* rest timer */
+.timer{position:fixed;left:50%;transform:translate(-50%,150%);bottom:calc(env(safe-area-inset-bottom,0px) + 72px);z-index:26;background:var(--ink);color:var(--bg);border-radius:18px;padding:8px 8px 8px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .25s ease,visibility .25s;visibility:hidden;width:max-content;max-width:calc(100% - 24px)}
+.timer.on{transform:translate(-50%,0);visibility:visible}
+.timer .t{font-family:var(--cond);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums;min-width:68px}
+.timer .lbl{font-size:13px;opacity:.75;line-height:1.2}
+.timer button{border:0;background:color-mix(in srgb,var(--bg) 18%,transparent);color:var(--bg);border-radius:12px;height:42px;padding:0 12px;font-weight:700;font-size:15px}
+.timer.ready{background:var(--ok)}
+
+/* sheet */
+dialog{border:0;border-radius:20px;max-height:calc(100dvh - 32px);overflow:auto;padding:0;width:min(520px,calc(100% - 24px));background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.sheet{padding:20px}
+.sheet h2{font-family:var(--cond);font-size:28px;margin:0 0 4px}
+.sheet .txt{width:100%;height:50px;border:1.5px solid var(--line-2);border-radius:12px;background:var(--surface-2);padding:0 12px;font-size:17px}
+.sheet .row{display:flex;gap:10px;margin-top:22px}
+.sheet .row .btn{flex:1}
+.small-print{font-size:14px;color:var(--muted);margin:16px 0 0}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translate(-50%,-20px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:15px;z-index:40;transition:all .2s;pointer-events:none;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (min-width:600px){.plates{gap:8px}.plate-body{height:96px}.plate.deload .plate-body{height:66px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <p class="brand">PPL <span>Logbook</span></p>
+  <div class="seg" id="lifterSeg" role="group" aria-label="Who’s lifting"></div>
+  <button class="icon-btn" id="openSettings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+</div></header>
+
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<nav class="tabs" aria-label="Sections"><div class="wrap">
+  <a href="#" id="tabProgram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12h3M19 12h3M7 7v10M17 7v10M5 9v6M19 9v6M7 12h10"/></svg>Program</a>
+  <a href="#progress" id="tabProgress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 16l5-5 4 3 6-7"/></svg>Progress</a>
+</div></nav>
+
+<div class="timer" id="timer" role="timer" aria-live="off">
+  <div><div class="t" id="timerT">0:00</div></div>
+  <div class="lbl" id="timerL">Rest</div>
+  <button id="timerAdd">+30s</button>
+  <button id="timerSkip">Done</button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<dialog id="settings"><div class="sheet">
+  <h2>Settings</h2>
+  <label class="f" for="n1">Lifter 1</label><input class="txt" id="n1" maxlength="20" autocomplete="off">
+  <label class="f" for="n2">Lifter 2</label><input class="txt" id="n2" maxlength="20" autocomplete="off">
+  <label class="f">Weight unit</label>
+  <div class="seg" id="unitSeg" role="group" aria-label="Weight unit"><button data-u="lb">lb</button><button data-u="kg">kg</button></div>
+  <p class="small-print" id="syncNote"></p>
+  <div id="backupBox">
+    <label class="f">Backup and share</label>
+    <p class="small-print" style="margin-top:0">Logs are stored on this phone. Export a backup now and then so nothing gets lost, and send it to your training partner. Importing their file adds their numbers here without touching yours.</p>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" id="exportBtn">Export</button><button class="btn ghost" id="importBtn">Import</button></div>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
+  <div class="row"><button class="btn ghost" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div>
+</div></dialog>
+
+<script>
+const P = [{"n":1,"phase":1,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"8-9","rest":"3-4 min","subs":["Hack Squat","DB Bulgarian Split Squat"]},{"name":"Pause Squat (Back off)","ss":null,"wu":"0","sets":"2","reps":"5","rpe":"8-9","rest":"3-4 min","subs":["Pause Hack Squat","Pause DB Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"10","rpe":"8-9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Leg Curl","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"4","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"Decline Plate-Weighted Crunch","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Cable Crunch","Machine Crunch"]}],"page":35},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Larsen Press","ss":null,"wu":"0","sets":"2","reps":"10","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press (No Leg Drive)","Machine Chest Press (No Leg Drive)"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]},{"name":"Press-Around","ss":"A1","wu":"1","sets":"2","reps":"12-15","rpe":"9-10","rest":"0 min","subs":["DB Flye","Deficit Push Up"]},{"name":"Pec Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Cross-Body Cable Y-Raise (Side Delt)","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"8 + 8","rpe":"9-10","rest":"1-2 min","subs":["Triceps Pressdown (12-15 reps)","DB Skull Crusher (12-15 reps)"]},{"name":"N1-Style Cross-Body Triceps Extension","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Single-Arm Tricep Pressdown","Single-Arm Cable Tricep Kickback"]}],"page":36},{"type":"Pull","ex":[{"name":"Lat Pulldown (Feeder Sets)","ss":null,"wu":"0","sets":"4","reps":"10","rpe":"See Notes","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Lat Pulldown (Failure Set)","ss":null,"wu":"0","sets":"1","reps":"10+5","rpe":"10","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Omni-Grip Machine Chest-Supported Row","ss":null,"wu":"2","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Incline Chest-Supported DB Row","Cable Seated Row"]},{"name":"Bottom-Half DB Lat Pullover","ss":"A1","wu":"1","sets":"2","reps":"10-12","rpe":"9-10","rest":"0 min","subs":["Cable Lat Pullover","1-Arm Lat Pull-In"]},{"name":"Lat Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Omni-Direction Face Pull","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"1","sets":"3","reps":"6-8","rpe":"9-10","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"Bottom-Half Preacher Curl","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Bottom-Half Spider Curl","Bottom-Half Bayesian Curl"]}],"page":37},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"5","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Stiff-Leg Deadlift","ss":null,"wu":"0","sets":"2","reps":"8","rpe":"8-9","rest":"3-4 min","subs":["Barbell RDL","DB RDL"]},{"name":"Close-Grip Barbell Incline Press","ss":null,"wu":"2-3","sets":"3","reps":"8, 5, 12","rpe":"8-9","rest":"3-4 min","subs":["Close-Grip DB Incline Press","Close-Grip Machine Press"]},{"name":"Chin-Up","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Underhand Lat Pulldown","Pull-Up"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Kroc Row","ss":null,"wu":"2","sets":"2","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Single-Arm DB Row","Meadows Row"]},{"name":"Diamond Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":38}]},{"n":2,"phase":1,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-4 min","subs":["Hack Squat","DB Bulgarian Split Squat"]},{"name":"Pause Squat (Back off)","ss":null,"wu":"0","sets":"2","reps":"5","rpe":"8-9","rest":"3-4 min","subs":["Pause Hack Squat","Pause DB Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"10","rpe":"8-9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Leg Curl","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"4","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"Decline Plate-Weighted Crunch","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Cable Crunch","Machine Crunch"]}],"page":39},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Larsen Press","ss":null,"wu":"0","sets":"2","reps":"10","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press (No Leg Drive)","Machine Chest Press (No Leg Drive)"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]},{"name":"Press-Around","ss":"A1","wu":"1","sets":"2","reps":"12-15","rpe":"9-10","rest":"0 min","subs":["DB Flye","Deficit Push Up"]},{"name":"Pec Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Cross-Body Cable Y-Raise (Side Delt)","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"8 + 8","rpe":"9-10","rest":"1-2 min","subs":["Triceps Pressdown (12-15 reps)","DB Skull Crusher (12-15 reps)"]},{"name":"N1-Style Cross-Body Triceps Extension","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Single-Arm Tricep Pressdown","Single-Arm Cable Tricep Kickback"]}],"page":40},{"type":"Pull","ex":[{"name":"Lat Pulldown (Feeder Sets)","ss":null,"wu":"0","sets":"4","reps":"10","rpe":"See Notes","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Lat Pulldown (Failure Set)","ss":null,"wu":"0","sets":"1","reps":"10+5","rpe":"10","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Omni-Grip Machine Chest-Supported Row","ss":null,"wu":"2","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Incline Chest-Supported DB Row","Cable Seated Row"]},{"name":"Bottom-Half DB Lat Pullover","ss":"A1","wu":"1","sets":"2","reps":"10-12","rpe":"9-10","rest":"0 min","subs":["Cable Lat Pullover","1-Arm Lat Pull-In"]},{"name":"Lat Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Omni-Direction Face Pull","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"1","sets":"3","reps":"6-8","rpe":"9-10","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"Bottom-Half Preacher Curl","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Bottom-Half Spider Curl","Bottom-Half Bayesian Curl"]}],"page":41},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"4","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Stiff-Leg Deadlift","ss":null,"wu":"0","sets":"2","reps":"8","rpe":"8-9","rest":"3-4 min","subs":["Barbell RDL","DB RDL"]},{"name":"Close-Grip Barbell Incline Press","ss":null,"wu":"2-3","sets":"3","reps":"8, 5, 12","rpe":"8-9","rest":"3-4 min","subs":["Close-Grip DB Incline Press","Close-Grip Machine Press"]},{"name":"Chin-Up","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Underhand Lat Pulldown","Pull-Up"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Kroc Row","ss":null,"wu":"2","sets":"2","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Single-Arm DB Row","Meadows Row"]},{"name":"Diamond Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":42}]},{"n":3,"phase":1,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat","ss":null,"wu":"3-4","sets":"1","reps":"4-6","rpe":"8-9","rest":"3-4 min","subs":["Hack Squat","DB Bulgarian Split Squat"]},{"name":"Pause Squat (Back off)","ss":null,"wu":"0","sets":"2","reps":"5","rpe":"8-9","rest":"3-4 min","subs":["Pause Hack Squat","Pause DB Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"10","rpe":"8-9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Leg Curl","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"4","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"Decline Plate-Weighted Crunch","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Cable Crunch","Machine Crunch"]}],"page":43},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Larsen Press","ss":null,"wu":"0","sets":"2","reps":"10","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press (No Leg Drive)","Machine Chest Press (No Leg Drive)"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]},{"name":"Press-Around","ss":"A1","wu":"1","sets":"2","reps":"12-15","rpe":"9-10","rest":"0 min","subs":["DB Flye","Deficit Push Up"]},{"name":"Pec Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Cross-Body Cable Y-Raise (Side Delt)","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"8 + 8","rpe":"9-10","rest":"1-2 min","subs":["Triceps Pressdown (12-15 reps)","DB Skull Crusher (12-15 reps)"]},{"name":"N1-Style Cross-Body Triceps Extension","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Single-Arm Tricep Pressdown","Single-Arm Cable Tricep Kickback"]}],"page":44},{"type":"Pull","ex":[{"name":"Lat Pulldown (Feeder Sets)","ss":null,"wu":"0","sets":"4","reps":"10","rpe":"See Notes","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Lat Pulldown (Failure Set)","ss":null,"wu":"0","sets":"1","reps":"10+5","rpe":"10","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Omni-Grip Machine Chest-Supported Row","ss":null,"wu":"2","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Incline Chest-Supported DB Row","Cable Seated Row"]},{"name":"Bottom-Half DB Lat Pullover","ss":"A1","wu":"1","sets":"2","reps":"10-12","rpe":"9-10","rest":"0 min","subs":["Cable Lat Pullover","1-Arm Lat Pull-In"]},{"name":"Lat Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Omni-Direction Face Pull","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"1","sets":"3","reps":"6-8","rpe":"9-10","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"Bottom-Half Preacher Curl","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Bottom-Half Spider Curl","Bottom-Half Bayesian Curl"]}],"page":45},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"3","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Stiff-Leg Deadlift","ss":null,"wu":"0","sets":"2","reps":"8","rpe":"8-9","rest":"3-4 min","subs":["Barbell RDL","DB RDL"]},{"name":"Close-Grip Barbell Incline Press","ss":null,"wu":"2-3","sets":"3","reps":"8, 5, 12","rpe":"8-9","rest":"3-4 min","subs":["Close-Grip DB Incline Press","Close-Grip Machine Press"]},{"name":"Chin-Up","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Underhand Lat Pulldown","Pull-Up"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Kroc Row","ss":null,"wu":"2","sets":"2","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Single-Arm DB Row","Meadows Row"]},{"name":"Diamond Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":46}]},{"n":4,"phase":1,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-4 min","subs":["Hack Squat","DB Bulgarian Split Squat"]},{"name":"Pause Squat (Back off)","ss":null,"wu":"0","sets":"2","reps":"5","rpe":"8-9","rest":"3-4 min","subs":["Pause Hack Squat","Pause DB Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"10","rpe":"8-9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Leg Curl","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"4","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"Decline Plate-Weighted Crunch","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Cable Crunch","Machine Crunch"]}],"page":47},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Larsen Press","ss":null,"wu":"0","sets":"2","reps":"10","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press (No Leg Drive)","Machine Chest Press (No Leg Drive)"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]},{"name":"Press-Around","ss":"A1","wu":"1","sets":"2","reps":"12-15","rpe":"9-10","rest":"0 min","subs":["DB Flye","Deficit Push Up"]},{"name":"Pec Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Cross-Body Cable Y-Raise (Side Delt)","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"8-9","rest":"1-2 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"8 + 8","rpe":"8-9","rest":"1-2 min","subs":["Triceps Pressdown (12-15 reps)","DB Skull Crusher (12-15 reps)"]},{"name":"N1-Style Cross-Body Triceps Extension","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Single-Arm Tricep Pressdown","Single-Arm Cable Tricep Kickback"]}],"page":48},{"type":"Pull","ex":[{"name":"Lat Pulldown (Feeder Sets)","ss":null,"wu":"0","sets":"4","reps":"10","rpe":"See Notes","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Lat Pulldown (Failure Set)","ss":null,"wu":"0","sets":"1","reps":"10+5","rpe":"10","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Omni-Grip Machine Chest-Supported Row","ss":null,"wu":"2","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Incline Chest-Supported DB Row","Cable Seated Row"]},{"name":"Bottom-Half DB Lat Pullover","ss":"A1","wu":"1","sets":"2","reps":"10-12","rpe":"9-10","rest":"0 min","subs":["Cable Lat Pullover","1-Arm Lat Pull-In"]},{"name":"Lat Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Omni-Direction Face Pull","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"1","sets":"3","reps":"6-8","rpe":"9-10","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"Bottom-Half Preacher Curl","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Bottom-Half Spider Curl","Bottom-Half Bayesian Curl"]}],"page":49},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"2","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Stiff-Leg Deadlift","ss":null,"wu":"0","sets":"2","reps":"8","rpe":"8-9","rest":"3-4 min","subs":["Barbell RDL","DB RDL"]},{"name":"Close-Grip Barbell Incline Press","ss":null,"wu":"2-3","sets":"3","reps":"8, 5, 12","rpe":"8-9","rest":"3-4 min","subs":["Close-Grip DB Incline Press","Close-Grip Machine Press"]},{"name":"Chin-Up","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Underhand Lat Pulldown","Pull-Up"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Kroc Row","ss":null,"wu":"2","sets":"2","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Single-Arm DB Row","Meadows Row"]},{"name":"Diamond Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":50}]},{"n":5,"phase":1,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"8-9","rest":"3-4 min","subs":["Hack Squat","DB Bulgarian Split Squat"]},{"name":"Pause Squat (Back off)","ss":null,"wu":"0","sets":"2","reps":"5","rpe":"8-9","rest":"3-4 min","subs":["Pause Hack Squat","Pause DB Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"10","rpe":"8-9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Leg Curl","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"4","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"Decline Plate-Weighted Crunch","ss":null,"wu":"1","sets":"3","reps":"10-12","rpe":"9-10","rest":"1-2 min","subs":["Cable Crunch","Machine Crunch"]}],"page":51},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Larsen Press","ss":null,"wu":"0","sets":"2","reps":"10","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press (No Leg Drive)","Machine Chest Press (No Leg Drive)"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]},{"name":"Press-Around","ss":"A1","wu":"1","sets":"2","reps":"12-15","rpe":"9-10","rest":"0 min","subs":["DB Flye","Deficit Push Up"]},{"name":"Pec Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Cross-Body Cable Y-Raise (Side Delt)","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"8 + 8","rpe":"9-10","rest":"1-2 min","subs":["Triceps Pressdown (12-15 reps)","DB Skull Crusher (12-15 reps)"]},{"name":"N1-Style Cross-Body Triceps Extension","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Single-Arm Tricep Pressdown","Single-Arm Cable Tricep Kickback"]}],"page":52},{"type":"Pull","ex":[{"name":"Lat Pulldown (Feeder Sets)","ss":null,"wu":"0","sets":"4","reps":"10","rpe":"See Notes","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Lat Pulldown (Failure Set)","ss":null,"wu":"0","sets":"1","reps":"10+5","rpe":"10","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Omni-Grip Machine Chest-Supported Row","ss":null,"wu":"2","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Incline Chest-Supported DB Row","Cable Seated Row"]},{"name":"Bottom-Half DB Lat Pullover","ss":"A1","wu":"1","sets":"2","reps":"10-12","rpe":"9-10","rest":"0 min","subs":["Cable Lat Pullover","1-Arm Lat Pull-In"]},{"name":"Lat Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Omni-Direction Face Pull","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"9-10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"1","sets":"3","reps":"6-8","rpe":"9-10","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"Bottom-Half Preacher Curl","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"10","rest":"1-2 min","subs":["Bottom-Half Spider Curl","Bottom-Half Bayesian Curl"]}],"page":53},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"1","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Stiff-Leg Deadlift","ss":null,"wu":"0","sets":"2","reps":"8","rpe":"8-9","rest":"3-4 min","subs":["Barbell RDL","DB RDL"]},{"name":"Close-Grip Barbell Incline Press","ss":null,"wu":"2-3","sets":"3","reps":"8, 5, 12","rpe":"8-9","rest":"3-4 min","subs":["Close-Grip DB Incline Press","Close-Grip Machine Press"]},{"name":"Chin-Up","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"8-9","rest":"2-3 min","subs":["Underhand Lat Pulldown","Pull-Up"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"3","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Kroc Row","ss":null,"wu":"2","sets":"2","reps":"10-12","rpe":"8-9","rest":"2-3 min","subs":["Single-Arm DB Row","Meadows Row"]},{"name":"Diamond Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":54}]},{"n":6,"phase":1,"deload":"semi","days":[{"type":"Legs","ex":[{"name":"Squat","ss":null,"wu":"3-4","sets":"1","reps":"1-3","rpe":"7","rest":"3-4 min","subs":["Hack Squat","DB Bulgarian Split Squat"]},{"name":"Pause Squat (Back off)","ss":null,"wu":"0","sets":"2","reps":"5","rpe":"7","rest":"3-4 min","subs":["Pause Hack Squat","Pause DB Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"7","rest":"2-3 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"10","rpe":"7","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Leg Curl","ss":null,"wu":"1","sets":"2","reps":"10-12","rpe":"8","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"2","reps":"10-12","rpe":"8","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"Decline Plate-Weighted Crunch","ss":null,"wu":"1","sets":"2","reps":"10-12","rpe":"8","rest":"1-2 min","subs":["Cable Crunch","Machine Crunch"]}],"page":55},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"7","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Larsen Press","ss":null,"wu":"0","sets":"2","reps":"10","rpe":"7","rest":"3-4 min","subs":["DB Bench Press (No Leg Drive)","Machine Chest Press (No Leg Drive)"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"7","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]},{"name":"Press-Around","ss":"A1","wu":"1","sets":"2","reps":"12-15","rpe":"8","rest":"0 min","subs":["DB Flye","Deficit Push Up"]},{"name":"Pec Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Cross-Body Cable Y-Raise (Side Delt)","ss":null,"wu":"1","sets":"2","reps":"12-15","rpe":"8","rest":"1-2 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension","ss":null,"wu":"1","sets":"2","reps":"8 + 8","rpe":"8","rest":"1-2 min","subs":["Triceps Pressdown (12-15 reps)","DB Skull Crusher (12-15 reps)"]},{"name":"N1-Style Cross-Body Triceps Extension","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"8","rest":"1-2 min","subs":["Single-Arm Tricep Pressdown","Single-Arm Cable Tricep Kickback"]}],"page":56},{"type":"Pull","ex":[{"name":"Lat Pulldown (Feeder Sets)","ss":null,"wu":"0","sets":"4","reps":"10","rpe":"See Notes","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Lat Pulldown (Failure Set)","ss":null,"wu":"0","sets":"1","reps":"10+5","rpe":"10","rest":"2-3 min","subs":["Machine Pulldown","Pull-Up"]},{"name":"Omni-Grip Machine Chest-Supported Row","ss":null,"wu":"2","sets":"3","reps":"10-12","rpe":"7","rest":"2-3 min","subs":["Incline Chest-Supported DB Row","Cable Seated Row"]},{"name":"Bottom-Half DB Lat Pullover","ss":"A1","wu":"1","sets":"2","reps":"10-12","rpe":"8","rest":"0 min","subs":["Cable Lat Pullover","1-Arm Lat Pull-In"]},{"name":"Lat Static Stretch 30s","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Omni-Direction Face Pull","ss":null,"wu":"1","sets":"3","reps":"12-15","rpe":"8","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"1","sets":"2","reps":"6-8","rpe":"8","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"Bottom-Half Preacher Curl","ss":null,"wu":"0","sets":"2","reps":"10-12","rpe":"8","rest":"1-2 min","subs":["Bottom-Half Spider Curl","Bottom-Half Bayesian Curl"]}],"page":57},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"4","rpe":"7","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Stiff-Leg Deadlift","ss":null,"wu":"0","sets":"2","reps":"8","rpe":"7","rest":"3-4 min","subs":["Barbell RDL","DB RDL"]},{"name":"Close-Grip Barbell Incline Press","ss":null,"wu":"2-3","sets":"2","reps":"8, 5","rpe":"7","rest":"3-4 min","subs":["Close-Grip DB Incline Press","Close-Grip Machine Press"]},{"name":"Chin-Up","ss":null,"wu":"2","sets":"2","reps":"8-10","rpe":"7","rest":"2-3 min","subs":["Underhand Lat Pulldown","Pull-Up"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"2","reps":"10-12","rpe":"7","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Kroc Row","ss":null,"wu":"2","sets":"2","reps":"10-12","rpe":"7","rest":"2-3 min","subs":["Single-Arm DB Row","Meadows Row"]},{"name":"Diamond Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":58}]},{"n":7,"phase":2,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat or Machine Squat","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["Machine Squat","Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Leg Extension","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Calf Raise","ss":null,"wu":"2","sets":"3","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Standing Calf Raise","Leg Press Toe Press"]},{"name":"Cable Crunch","ss":null,"wu":"2","sets":"3","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Plate-Weighted Crunch","Machine Crunch"]}],"page":60},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"High-Incline Smith Machine Press","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Incline DB Press","Incline Machine Press"]},{"name":"Egyptian Cable Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Overhead Cable Triceps Extension","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Cable Triceps Kickback","ss":null,"wu":"1","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Triceps Kickback","Triceps Pressdown"]}],"page":61},{"type":"Pull","ex":[{"name":"Neutral-Grip Lat Pulldown","ss":null,"wu":"3","sets":"3","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Neutral-Grip Pull-Up","Machine Pulldown"]},{"name":"Pendlay Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Meadows Row","Single-Arm Row"]},{"name":"Reverse Pec Deck","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Curl","Cable Curl"]},{"name":"Hammer Cheat Curl","ss":null,"wu":"1","sets":"1","reps":"4-6","rpe":"10","rest":"0 min","subs":["Inverse Zottman Curl","DB Curl"]}],"page":62},{"type":"Full Body","ex":[{"name":"Hack Squat","ss":null,"wu":"3-4","sets":"2","reps":"4-6","rpe":"9-10","rest":"3-5 min","subs":["Machine Squat","Bulgarian Split Squat"]},{"name":"Seated DB Shoulder Press","ss":null,"wu":"3","sets":"2","reps":"6-8","rpe":"10","rest":"3-4 min","subs":["Machine Shoulder Press","Standing DB Arnold Press"]},{"name":"Close-Grip Seated Cable Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["T-Bar Row","Incline Chest-Supported DB Row"]},{"name":"Weighted Dip","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Machine Chest Press","DB Bench Press"]},{"name":"Seated Leg Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Machine Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Cable Lateral Raise"]}],"page":63}]},{"n":8,"phase":2,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat or Machine Squat","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["Machine Squat","Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Leg Extension","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Calf Raise","ss":null,"wu":"2","sets":"3","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Standing Calf Raise","Leg Press Toe Press"]},{"name":"Cable Crunch","ss":null,"wu":"2","sets":"3","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Plate-Weighted Crunch","Machine Crunch"]}],"page":64},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"High-Incline Smith Machine Press","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Incline DB Press","Incline Machine Press"]},{"name":"Egyptian Cable Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Overhead Cable Triceps Extension","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Cable Triceps Kickback","ss":null,"wu":"1","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Triceps Kickback","Triceps Pressdown"]}],"page":65},{"type":"Pull","ex":[{"name":"Neutral-Grip Lat Pulldown","ss":null,"wu":"3","sets":"3","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Neutral-Grip Pull-Up","Machine Pulldown"]},{"name":"Pendlay Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Meadows Row","Single-Arm Row"]},{"name":"Reverse Pec Deck","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Curl","Cable Curl"]},{"name":"Hammer Cheat Curl","ss":null,"wu":"1","sets":"1","reps":"4-6","rpe":"10","rest":"0 min","subs":["Inverse Zottman Curl","DB Curl"]}],"page":66},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"2","reps":"4-6","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Seated DB Shoulder Press","ss":null,"wu":"3","sets":"2","reps":"6-8","rpe":"10","rest":"3-4 min","subs":["Machine Shoulder Press","Standing DB Arnold Press"]},{"name":"Close-Grip Seated Cable Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["T-Bar Row","Incline Chest-Supported DB Row"]},{"name":"Weighted Dip","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Machine Chest Press","DB Bench Press"]},{"name":"Seated Leg Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Machine Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Cable Lateral Raise"]}],"page":67}]},{"n":9,"phase":2,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat or Machine Squat","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["Machine Squat","Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Leg Extension","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Calf Raise","ss":null,"wu":"2","sets":"3","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Standing Calf Raise","Leg Press Toe Press"]},{"name":"Cable Crunch","ss":null,"wu":"2","sets":"3","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Plate-Weighted Crunch","Machine Crunch"]}],"page":68},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"High-Incline Smith Machine Press","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Incline DB Press","Incline Machine Press"]},{"name":"Egyptian Cable Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Overhead Cable Triceps Extension","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Cable Triceps Kickback","ss":null,"wu":"1","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Triceps Kickback","Triceps Pressdown"]}],"page":69},{"type":"Pull","ex":[{"name":"Neutral-Grip Lat Pulldown","ss":null,"wu":"3","sets":"3","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Neutral-Grip Pull-Up","Machine Pulldown"]},{"name":"Pendlay Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Meadows Row","Single-Arm Row"]},{"name":"Reverse Pec Deck","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Curl","Cable Curl"]},{"name":"Hammer Cheat Curl","ss":null,"wu":"1","sets":"1","reps":"4-6","rpe":"10","rest":"0 min","subs":["Inverse Zottman Curl","DB Curl"]}],"page":70},{"type":"Full Body","ex":[{"name":"Hack Squat","ss":null,"wu":"3-4","sets":"2","reps":"4-6","rpe":"9-10","rest":"3-5 min","subs":["Machine Squat","Bulgarian Split Squat"]},{"name":"Seated DB Shoulder Press","ss":null,"wu":"3","sets":"2","reps":"6-8","rpe":"10","rest":"3-4 min","subs":["Machine Shoulder Press","Standing DB Arnold Press"]},{"name":"Close-Grip Seated Cable Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["T-Bar Row","Incline Chest-Supported DB Row"]},{"name":"Weighted Dip","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Machine Chest Press","DB Bench Press"]},{"name":"Seated Leg Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Machine Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Cable Lateral Raise"]}],"page":71}]},{"n":10,"phase":2,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Squat or Machine Squat","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["Machine Squat","Bulgarian Split Squat"]},{"name":"Barbell RDL","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["DB RDL","45\u00b0 Hyperextension"]},{"name":"Leg Extension","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"Seated Calf Raise","ss":null,"wu":"2","sets":"3","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Standing Calf Raise","Leg Press Toe Press"]},{"name":"Cable Crunch","ss":null,"wu":"2","sets":"3","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Plate-Weighted Crunch","Machine Crunch"]}],"page":72},{"type":"Push","ex":[{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"3-5","rpe":"8-9","rest":"3-5 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"High-Incline Smith Machine Press","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Incline DB Press","Incline Machine Press"]},{"name":"Egyptian Cable Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Machine Lateral Raise"]},{"name":"Overhead Cable Triceps Extension","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Cable Triceps Kickback","ss":null,"wu":"1","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Triceps Kickback","Triceps Pressdown"]}],"page":73},{"type":"Pull","ex":[{"name":"Neutral-Grip Lat Pulldown","ss":null,"wu":"3","sets":"3","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Neutral-Grip Pull-Up","Machine Pulldown"]},{"name":"Pendlay Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Meadows Row","Single-Arm Row"]},{"name":"Reverse Pec Deck","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["DB Curl","Cable Curl"]},{"name":"Hammer Cheat Curl","ss":null,"wu":"1","sets":"1","reps":"4-6","rpe":"10","rest":"0 min","subs":["Inverse Zottman Curl","DB Curl"]}],"page":74},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"2","reps":"4-6","rpe":"8-9","rest":"3-5 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Seated DB Shoulder Press","ss":null,"wu":"3","sets":"2","reps":"6-8","rpe":"10","rest":"3-4 min","subs":["Machine Shoulder Press","Standing DB Arnold Press"]},{"name":"Close-Grip Seated Cable Row","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["T-Bar Row","Incline Chest-Supported DB Row"]},{"name":"Weighted Dip","ss":null,"wu":"3","sets":"2","reps":"4-6","rpe":"10","rest":"3-4 min","subs":["Machine Chest Press","DB Bench Press"]},{"name":"Seated Leg Curl","ss":null,"wu":"2","sets":"2","reps":"4-6","rpe":"10","rest":"2-3 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Machine Lateral Raise","ss":null,"wu":"2","sets":"2","reps":"6-8","rpe":"10","rest":"2-3 min","subs":["DB Lateral Raise","Cable Lateral Raise"]}],"page":75}]},{"n":11,"phase":3,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Front Squat","ss":null,"wu":"2-3","sets":"3","reps":"15","rpe":"7-8","rest":"2-3 min","subs":["High-Bar Box Squat","Goblet Squat"]},{"name":"Dumbbell RDL","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"9","rest":"2-3 min","subs":["Barbell RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"3","reps":"10","rpe":"9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"SLOW Seated Leg Curl (3 up, 3 down)","ss":null,"wu":"1","sets":"3","reps":"8","rpe":"10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"LLPT Plank","ss":null,"wu":"0","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Ab Wheel Rollout","Plank"]}],"page":77},{"type":"Push","ex":[{"name":"Low Incline DB Press","ss":null,"wu":"2","sets":"3","reps":"20","rpe":"9","rest":"2-3 min","subs":["Low Incline Machine Press","Low Incline Smith Machine Press"]},{"name":"Machine Shoulder Press","ss":null,"wu":"2","sets":"3","reps":"15","rpe":"9","rest":"2-3 min","subs":["DB Shoulder Press","Standing DB Arnold Press"]},{"name":"Cable Crossover Ladder","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Flat-To-Incline DB Flye","Pec Deck"]},{"name":"Lean-In Constant Tension DB Lateral Raise","ss":"A1","wu":"1","sets":"3","reps":"15","rpe":"10","rest":"0 min","subs":["Constant-Tension Cable Lateral Raise","Constant-Tension Machine Lateral Raise"]},{"name":"Side Delt Static STRETCH (30s)","ss":"A2","wu":"0","sets":"3","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Med-Ball Close Grip Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":78},{"type":"Pull","ex":[{"name":"1-Arm Half Kneeling Lat Pulldown","ss":null,"wu":"1","sets":"2","reps":"20","rpe":"9","rest":"1-2 min","subs":["1-Arm Lat Pull-In","Cable Lat Pullover"]},{"name":"Omni-Grip Lat Pulldown","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"9","rest":"2-3 min","subs":["Omni-Grip Pull-Up","Chin-Up"]},{"name":"Machine Low Row","ss":null,"wu":"2","sets":"4","reps":"20","rpe":"9","rest":"2-3 min","subs":["Helms Row","Incline Chest-Supported DB Row"]},{"name":"Cable Shrug-In","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["DB Shrug","Plate Shrug"]},{"name":"Reverse Pec Deck","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl (Heavy)","ss":null,"wu":"2","sets":"1","reps":"4-6","rpe":"9","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"EZ-Bar Modified Bicep 21's","ss":"A1","wu":"0","sets":"2","reps":"21","rpe":"10","rest":"0 min","subs":["DB Curl 21's","Cable Curl 21's"]},{"name":"Bicep Static STRETCH (30s)","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]}],"page":79},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"2","reps":"8","rpe":"9","rest":"3-4 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Bench Press (Top Set)","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Bench Press (Back Off AMRAP)","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Pull-Up","ss":null,"wu":"2","sets":"6","reps":"3","rpe":"7-8","rest":"15 sec","subs":["Lat Pulldown","Machine Pulldown"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"2","reps":"20","rpe":"9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Wide-Grip Cable Row","ss":null,"wu":"2","sets":"10","reps":"3","rpe":"7-8","rest":"15 sec","subs":["Wide-Grip Machine Row","Wide-Grip T-Bar Row"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"15","rpe":"9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]}],"page":80}]},{"n":12,"phase":3,"deload":null,"days":[{"type":"Legs","ex":[{"name":"Front Squat","ss":null,"wu":"2-3","sets":"3","reps":"15","rpe":"7-8","rest":"2-3 min","subs":["High-Bar Box Squat","Goblet Squat"]},{"name":"Dumbbell RDL","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"9","rest":"2-3 min","subs":["Barbell RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"3","reps":"10","rpe":"9","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"SLOW Seated Leg Curl (3 up, 3 down)","ss":null,"wu":"1","sets":"3","reps":"8","rpe":"10","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"LLPT Plank","ss":null,"wu":"0","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Ab Wheel Rollout","Plank"]}],"page":81},{"type":"Push","ex":[{"name":"Low Incline DB Press","ss":null,"wu":"2","sets":"3","reps":"20","rpe":"9","rest":"2-3 min","subs":["Low Incline Machine Press","Low Incline Smith Machine Press"]},{"name":"Machine Shoulder Press","ss":null,"wu":"2","sets":"3","reps":"15","rpe":"9","rest":"2-3 min","subs":["DB Shoulder Press","Standing DB Arnold Press"]},{"name":"Cable Crossover Ladder","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Flat-To-Incline DB Flye","Pec Deck"]},{"name":"Lean-In Constant Tension DB Lateral Raise","ss":"A1","wu":"1","sets":"3","reps":"15","rpe":"10","rest":"0 min","subs":["Constant-Tension Cable Lateral Raise","Constant-Tension Machine Lateral Raise"]},{"name":"Side Delt Static STRETCH (30s)","ss":"A2","wu":"0","sets":"3","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Overhead Triceps Extension","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Med-Ball Close Grip Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":82},{"type":"Pull","ex":[{"name":"1-Arm Half Kneeling Lat Pulldown","ss":null,"wu":"1","sets":"2","reps":"20","rpe":"9","rest":"1-2 min","subs":["1-Arm Lat Pull-In","Cable Lat Pullover"]},{"name":"Omni-Grip Lat Pulldown","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"9","rest":"2-3 min","subs":["Omni-Grip Pull-Up","Chin-Up"]},{"name":"Machine Low Row","ss":null,"wu":"2","sets":"4","reps":"20","rpe":"9","rest":"2-3 min","subs":["Helms Row","Incline Chest-Supported DB Row"]},{"name":"Cable Shrug-In","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["DB Shrug","Plate Shrug"]},{"name":"Reverse Pec Deck","ss":null,"wu":"1","sets":"3","reps":"20","rpe":"10","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl (Heavy)","ss":null,"wu":"2","sets":"1","reps":"4-6","rpe":"9","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"EZ-Bar Modified Bicep 21's","ss":"A1","wu":"0","sets":"2","reps":"21","rpe":"10","rest":"0 min","subs":["DB Curl 21's","Cable Curl 21's"]},{"name":"Bicep Static STRETCH (30s)","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]}],"page":83},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"2","reps":"8","rpe":"9","rest":"3-4 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Bench Press (Top Set)","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"8-9","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Bench Press (Back Off AMRAP)","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"10","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Pull-Up","ss":null,"wu":"2","sets":"6","reps":"3","rpe":"7-8","rest":"15 sec","subs":["Lat Pulldown","Machine Pulldown"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"2","reps":"20","rpe":"9","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Wide-Grip Cable Row","ss":null,"wu":"2","sets":"10","reps":"3","rpe":"7-8","rest":"15 sec","subs":["Wide-Grip Machine Row","Wide-Grip T-Bar Row"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"3","reps":"15","rpe":"9","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]}],"page":84}]},{"n":13,"phase":3,"deload":"full","days":[{"type":"Legs","ex":[{"name":"Front Squat","ss":null,"wu":"2-3","sets":"2","reps":"10","rpe":"6","rest":"2-3 min","subs":["High-Bar Box Squat","Goblet Squat"]},{"name":"Dumbbell RDL","ss":null,"wu":"1","sets":"2","reps":"12","rpe":"6","rest":"2-3 min","subs":["Barbell RDL","45\u00b0 Hyperextension"]},{"name":"Walking Lunge","ss":null,"wu":"1","sets":"2","reps":"8","rpe":"6","rest":"2-3 min","subs":["DB Step-Up","Goblet Squat"]},{"name":"SLOW Seated Leg Curl (3 up, 3 down)","ss":null,"wu":"1","sets":"2","reps":"8","rpe":"7","rest":"1-2 min","subs":["Lying Leg Curl","Nordic Ham Curl"]},{"name":"Leg Press Toe Press","ss":null,"wu":"1","sets":"2","reps":"12","rpe":"7","rest":"1-2 min","subs":["Seated Calf Raise","Standing Calf Raise"]},{"name":"LLPT Plank","ss":null,"wu":"0","sets":"1","reps":"30s","rpe":"7","rest":"1-2 min","subs":["Ab Wheel Rollout","Plank"]}],"page":85},{"type":"Push","ex":[{"name":"Low Incline DB Press","ss":null,"wu":"2","sets":"2","reps":"12","rpe":"6","rest":"2-3 min","subs":["Low Incline Machine Press","Low Incline Smith Machine Press"]},{"name":"Machine Shoulder Press","ss":null,"wu":"2","sets":"2","reps":"12","rpe":"6","rest":"2-3 min","subs":["DB Shoulder Press","Standing DB Arnold Press"]},{"name":"Cable Crossover Ladder","ss":null,"wu":"1","sets":"2","reps":"15","rpe":"7","rest":"1-2 min","subs":["Flat-To-Incline DB Flye","Pec Deck"]},{"name":"Lean-In Constant Tension DB Lateral Raise","ss":"A1","wu":"1","sets":"2","reps":"12","rpe":"7","rest":"0 min","subs":["Constant-Tension Cable Lateral Raise","Constant-Tension Machine Lateral Raise"]},{"name":"Side Delt Static STRETCH (30s)","ss":"A2","wu":"0","sets":"2","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]},{"name":"Overhead Triceps Extension","ss":null,"wu":"1","sets":"2","reps":"15","rpe":"7","rest":"1-2 min","subs":["DB Floor Skull Crusher","DB French Press"]},{"name":"Med-Ball Close Grip Pushup","ss":null,"wu":"0","sets":"1","reps":"AMRAP","rpe":"7","rest":"0 min","subs":["Close-Grip Push Up","Kneeling Modified Push Up"]}],"page":86},{"type":"Pull","ex":[{"name":"1-Arm Half Kneeling Lat Pulldown","ss":null,"wu":"1","sets":"2","reps":"12","rpe":"6","rest":"1-2 min","subs":["1-Arm Lat Pull-In","Cable Lat Pullover"]},{"name":"Omni-Grip Lat Pulldown","ss":null,"wu":"1","sets":"3","reps":"12","rpe":"6","rest":"2-3 min","subs":["Omni-Grip Pull-Up","Chin-Up"]},{"name":"Machine Low Row","ss":null,"wu":"2","sets":"2","reps":"12","rpe":"6","rest":"2-3 min","subs":["Helms Row","Incline Chest-Supported DB Row"]},{"name":"Cable Shrug-In","ss":null,"wu":"1","sets":"2","reps":"12","rpe":"7","rest":"1-2 min","subs":["DB Shrug","Plate Shrug"]},{"name":"Reverse Pec Deck","ss":null,"wu":"1","sets":"2","reps":"12","rpe":"7","rest":"1-2 min","subs":["Reverse Cable Flye","Bent-Over Reverse DB Flye"]},{"name":"EZ-Bar Curl (Heavy)","ss":null,"wu":"2","sets":"1","reps":"4-6","rpe":"7","rest":"1-2 min","subs":["DB Curl","Cable Curl"]},{"name":"EZ-Bar Modified Bicep 21's","ss":"A1","wu":"0","sets":"1","reps":"21","rpe":"7","rest":"0 min","subs":["DB Curl 21's","Cable Curl 21's"]},{"name":"Bicep Static STRETCH (30s)","ss":"A2","wu":"0","sets":"1","reps":"30s HOLD","rpe":"N/A","rest":"0 min","subs":[]}],"page":87},{"type":"Full Body","ex":[{"name":"Deadlift","ss":null,"wu":"3-4","sets":"1","reps":"8","rpe":"6","rest":"3-4 min","subs":["Trap Bar Deadlift","Barbell Hip Thrust"]},{"name":"Bench Press","ss":null,"wu":"3-4","sets":"1","reps":"2-4","rpe":"6","rest":"3-4 min","subs":["DB Bench Press","Machine Chest Press"]},{"name":"Pull-Up","ss":null,"wu":"2","sets":"4","reps":"3","rpe":"6","rest":"15 sec","subs":["Lat Pulldown","Machine Pulldown"]},{"name":"Leg Press","ss":null,"wu":"2-3","sets":"1","reps":"12","rpe":"6","rest":"2-3 min","subs":["Goblet Squat","Walking Lunge"]},{"name":"Wide-Grip Cable Row","ss":null,"wu":"2","sets":"6","reps":"3","rpe":"6","rest":"15 sec","subs":["Wide-Grip Machine Row","Wide-Grip T-Bar Row"]},{"name":"Standing Dumbbell Arnold Press","ss":null,"wu":"2","sets":"2","reps":"12","rpe":"6","rest":"2-3 min","subs":["Seated DB Shoulder Press","Machine Shoulder Press"]}],"page":88}]}];
+/* Form cues written for this app (not the program's text). m = how the prescribed sets work, c = form cues */
+const CUES = {
+  "Squat":{c:"Take a big breath and brace before you unrack, and hold that brace through every rep. Break at the hips and knees together, keep the bar over mid-foot, and drive up without letting your chest fold forward."},
+  "Pause Squat (Back off)":{m:"Lighter than your top set (roughly 25% less), with a 2-second pause at the bottom of each rep.",c:"Stay tight during the pause instead of relaxing into the hole, then stand up exactly like a normal squat."},
+  "Squat or Machine Squat":{c:"Pick whichever lets you push hardest safely today. Same rules either way: brace, control the way down, drive through your whole foot."},
+  "Front Squat":{c:"Elbows high so the bar sits on your front delts and your torso stays upright. Sit straight down between your hips; if your elbows sag, the bar rolls forward."},
+  "Hack Squat":{c:"Feet mid-platform, back and shoulders pinned to the pads. Go at least to parallel, then push through mid-foot without slamming into lockout."},
+  "Barbell RDL":{c:"Soft knees, push your hips back and let the bar slide down your thighs. Stop when your hamstrings are fully loaded, before your lower back starts to round."},
+  "Dumbbell RDL":{c:"Dumbbells close to your legs, hips back, slight knee bend. Go as deep as your hamstrings allow with a flat back, then squeeze your glutes to stand."},
+  "Stiff-Leg Deadlift":{c:"Hips stay higher than a regular deadlift with only a small knee bend, so the hamstrings do the work. Keep the bar dragging close to your legs."},
+  "Deadlift":{m:"Sumo or conventional, whichever you’re stronger at.",c:"Bar over mid-foot, pull the slack out before it leaves the floor, then push the floor away. Finish with your glutes rather than leaning back."},
+  "Walking Lunge":{c:"Moderate step, tall torso, and drive through the front heel. Let the back knee come close to the floor without banging it."},
+  "Seated Leg Curl":{c:"Pad just above your heels and lean your torso forward a little to stretch the hamstrings. Curl all the way and control the return."},
+  "SLOW Seated Leg Curl (3 up, 3 down)":{m:"3 seconds to curl, 3 seconds to return. Use noticeably less weight than usual.",c:"Zero momentum. If you can’t keep the count, the weight is too heavy."},
+  "Leg Press Toe Press":{c:"Balls of your feet on the bottom edge of the platform, knees nearly straight. Sink into a full stretch, pause so there’s no bounce, then rise as high as you can."},
+  "Leg Press":{c:"Feet about shoulder-width, lower until your knees are deep but your lower back stays flat on the pad. Don’t snap your knees locked at the top."},
+  "Leg Extension":{c:"Line your knee up with the machine’s pivot and set the pad on your lower shin. Hold the top for a beat and lower under control."},
+  "Seated Calf Raise":{c:"Pause in the stretched bottom position, then rise all the way up onto your big toe. Full range beats heavy half-reps."},
+  "Decline Plate-Weighted Crunch":{c:"Weight held at your chest. Curl your ribs toward your hips rather than just sitting up, and lower slowly."},
+  "Cable Crunch":{c:"Kneel facing the stack with the rope by your head and your hips fixed. Round your spine down toward your knees; the motion comes from your abs, not your hips."},
+  "LLPT Plank":{c:"A much harder plank: tuck your pelvis under, squeeze glutes and quads hard, and set your elbows a bit further forward than your shoulders."},
+
+  "Bench Press":{c:"Shoulder blades pinned back and down, feet planted, butt on the bench. Bring the bar to your lower chest, hold it still for a moment, then drive it up fast."},
+  "Bench Press (Top Set)":{m:"Your one heavy set for the day.",c:"Shoulder blades pinned, feet planted, brief pause on the chest, then press hard. Use safeties or a spotter."},
+  "Bench Press (Back Off AMRAP)":{m:"About 60% of your top-set weight for as many reps as you can.",c:"Stop when the bar slows to a grind. Safeties or a spotter are a must."},
+  "Larsen Press":{c:"Bench with your legs straight out or raised so you get no leg drive. Keep your upper back tight; it feels unstable, so go lighter than regular bench."},
+  "Standing Dumbbell Arnold Press":{c:"Start at chin height with palms facing you, then rotate them forward as you press overhead. Squeeze your glutes so you don’t lean back."},
+  "Seated DB Shoulder Press":{c:"Back against the pad, dumbbells start around ear height. Press up and slightly in without clanking them together."},
+  "Machine Shoulder Press":{c:"Seat height so the handles start around shoulder level. Press without shrugging and lower until your elbows are just below the handles."},
+  "Press-Around":{c:"Side-on to the cable, press the handle forward and across until it passes your midline. Steady yourself with the free hand and hold the finish for a beat."},
+  "Pec Static Stretch 30s":{c:"Forearm on a doorframe or rack, then turn your body away until you feel your chest open up. Firm but not painful; hold the full 30 seconds."},
+  "Cross-Body Cable Y-Raise (Side Delt)":{c:"Cable set low on the opposite side. Sweep your arm up and out on a diagonal, leading with the elbow, and stop around head height."},
+  "Squeeze-Only Triceps Pressdown + Stretch-Only Overhead Triceps Extension":{m:"8 pressdowns using only the bottom (lockout) half of the range, then go straight into 8 overhead extensions using only the deep, stretched half.",c:"Elbows stay put on both. No rest between the two halves."},
+  "N1-Style Cross-Body Triceps Extension":{c:"One arm, cable on the opposite side around chest height. Extend across your body with your elbow out wider than a normal pressdown, finishing fully straight."},
+  "High-Incline Smith Machine Press":{c:"Bench at a steep incline (around 45° or more). Lower to your upper chest and press without letting your shoulders roll forward."},
+  "Egyptian Cable Lateral Raise":{c:"Hold the cable post and lean your body away from it, then raise the handle out to the side. The lean keeps tension on the delt at the bottom."},
+  "Overhead Cable Triceps Extension":{c:"Face away from the stack with the rope behind your head. Let your elbows travel back for a deep stretch, then extend while your upper arms stay still."},
+  "Cable Triceps Kickback":{c:"Hinge forward with your upper arm parallel to the floor and locked in place. Straighten the elbow fully and squeeze before lowering."},
+  "Overhead Triceps Extension":{c:"Upper arms by your ears and fixed. Lower into a deep stretch behind your head, then extend all the way."},
+  "Weighted Dip":{c:"Lean forward slightly and lower until your upper arms are about parallel to the floor. Press back up without bouncing out of the bottom."},
+  "Close-Grip Barbell Incline Press":{c:"Hands about shoulder-width, elbows tucked toward your sides. Touch your upper chest and press, thinking triceps."},
+  "Diamond Pushup":{c:"Hands together under your chest so your thumbs and index fingers touch. Body in a straight line; go until your form breaks."},
+  "Med-Ball Close Grip Pushup":{c:"Both hands on a medicine ball under your chest. Move slowly and keep your core tight so the ball stays put."},
+  "Low Incline DB Press":{c:"Bench at a low incline (about 15–30°). Lower the dumbbells to the sides of your chest for a deep stretch, then press up and slightly in."},
+  "Machine Lateral Raise":{c:"Pads on the outside of your arms, shoulders down. Raise until your arms are about level with the floor, leading with the elbows."},
+  "Cable Crossover Ladder":{m:"Change the pulley height each set: low for set 1, middle for set 2, high for set 3.",c:"Slight bend in the elbows, bring your hands together in front, and squeeze for a beat."},
+  "Lean-In Constant Tension DB Lateral Raise":{c:"Hold a bench or upright with your free hand so your body tilts slightly. Raise to shoulder height and stop just short of the bottom so the delt never rests."},
+  "Side Delt Static STRETCH (30s)":{c:"Pull your arm across your chest (or behind your back) until you feel it in the side of the shoulder, and hold."},
+
+  "Pull-Up":{c:"Start from a dead hang and pull your chest toward the bar by driving your elbows down. Lower all the way under control."},
+  "Chin-Up":{c:"Underhand grip about shoulder-width. Pull until your chin clears the bar and return to a full hang."},
+  "Pendlay Row":{c:"Bar starts on the floor every rep with your torso close to parallel. Row explosively to your lower chest, then set it back down."},
+  "Kroc Row":{c:"A heavy single-arm dumbbell row with a more upright torso and a little body English allowed. Straps are fine if grip gives out first."},
+  "Neutral-Grip Lat Pulldown":{c:"Palms facing each other, slight lean back. Drive your elbows down to your sides and let your arms stretch fully at the top."},
+  "Omni-Grip Lat Pulldown":{m:"Change grip each set: wide overhand, then medium overhand, then close underhand.",c:"Chest up, elbows down to your sides, full stretch at the top."},
+  "Lat Pulldown (Feeder Sets)":{m:"Four sets of 10 that get heavier each time. The first is easy; the fourth should take you to failure.",c:"Same clean form on every set: chest up, elbows down, full stretch at the top."},
+  "Lat Pulldown (Failure Set)":{m:"Go to failure around 10 reps, then immediately drop the weight by roughly a third to a half and do 5 more controlled reps.",c:"Have the pin ready to move so the drop is quick."},
+  "1-Arm Half Kneeling Lat Pulldown":{c:"Kneel on one knee and pull the handle down toward your hip, elbow close to your side. Let the lat stretch fully at the top."},
+  "Omni-Grip Machine Chest-Supported Row":{m:"A different grip each working set, going from wide to narrow.",c:"Chest stays on the pad. Pull your elbows back, squeeze, and let your shoulders reach forward on the way back."},
+  "Machine Low Row":{c:"Chest tall, pull the handles to your lower ribs and squeeze your shoulder blades together. Let them reach forward for a stretch each rep."},
+  "Close-Grip Seated Cable Row":{c:"Sit tall and pull the handle to your stomach with elbows close. You can lean forward slightly on the return for a bigger stretch, without rounding."},
+  "Wide-Grip Cable Row":{c:"Wide bar, pull toward your lower chest with elbows flared to about 45–60° to hit the upper back."},
+  "Omni-Direction Face Pull":{m:"Change the cable angle each set: pull up from low, straight back from chest height, then down from high.",c:"Rope to your face, elbows high, and finish with your hands beside your ears."},
+  "Reverse Pec Deck":{c:"Face the pad with arms nearly straight and sweep them back and out. Don’t squeeze your shoulder blades hard; let the rear delts move it."},
+  "Bottom-Half DB Lat Pullover":{m:"Stretched half only: don’t bring the dumbbell back up over your face.",c:"Slight elbow bend, ribs down, and feel the lats pull the weight up from the stretch."},
+  "Lat Static Stretch 30s":{c:"Grab something around hip height and sit your hips back until you feel the lats stretch along your sides. Hold."},
+  "Bottom-Half Preacher Curl":{m:"Stretched half only: stop around halfway up.",c:"Upper arm stays on the pad. Lower all the way to nearly straight arms each rep."},
+  "EZ-Bar Curl":{c:"Elbows pinned at your sides, curl without swinging, and lower all the way."},
+  "EZ-Bar Curl (Heavy)":{c:"Heavier than usual, but elbows still stay near your sides. A tiny bit of body movement is OK; control the lowering."},
+  "Hammer Cheat Curl":{c:"Neutral grip. A little body swing to get the weight up is allowed, but lower it slowly with your elbows in place."},
+  "EZ-Bar Modified Bicep 21's":{m:"21 reps in three chunks of 7: seated, standing full range, then standing bottom-half only.",c:"No rest between chunks. Pick a weight well below your normal curl."},
+  "Bicep Static STRETCH (30s)":{c:"Arm straight behind you with your palm on a wall or rack, then turn away until you feel the biceps stretch. Hold."},
+  "Cable Shrug-In":{c:"Two low cable handles. Shrug up and slightly in toward your ears, pause, then lower all the way."},
+
+  /* substitutions */
+  "1-Arm Lat Pull-In":{c:"Cable set high on one side. Pull your elbow down and in toward your hip in an arc, feeling the lat."},
+  "45° Hyperextension":{c:"Pad just below your hip crease. Hinge down with a flat back and squeeze glutes and hamstrings to come up."},
+  "Ab Wheel Rollout":{c:"Ribs down, glutes tight. Roll out only as far as you can without your lower back sagging."},
+  "Barbell Hip Thrust":{c:"Upper back on the bench, chin tucked. Drive through your heels and lock out with your glutes, not your lower back."},
+  "Bent-Over Reverse DB Flye":{c:"Hinge to near parallel, slight elbow bend, and sweep the dumbbells out wide with your rear delts."},
+  "Bottom-Half Bayesian Curl":{c:"Face away from a low cable with your arm behind you. Only curl through the stretched lower half."},
+  "Bottom-Half Spider Curl":{c:"Chest on an incline bench, arms hanging straight down. Curl only through the lower half of the range."},
+  "Bulgarian Split Squat":{c:"Rear foot on a bench, front foot far enough forward that you can sink deep. Drive through the front heel."},
+  "Cable Curl":{c:"Elbows fixed at your sides; the cable keeps tension the whole way, so lower slowly."},
+  "Cable Curl 21's":{c:"Three chunks of 7: bottom half, top half, then full range. No rest between."},
+  "Cable Lat Pullover":{c:"Rope or bar on a high cable, arms nearly straight. Sweep down to your thighs using your lats, then let them stretch up."},
+  "Cable Lateral Raise":{c:"Cable low on the opposite side, raise out to shoulder height leading with the elbow."},
+  "Cable Seated Row":{c:"Sit tall, pull to your stomach, squeeze your shoulder blades, then let them stretch forward."},
+  "Close-Grip DB Incline Press":{c:"Dumbbells pressed together over your chest, elbows tucked; focus on the triceps."},
+  "Close-Grip Machine Press":{c:"Narrow handles, elbows tucked toward your sides, press with the triceps."},
+  "Close-Grip Push Up":{c:"Hands just inside shoulder-width, elbows brushing your ribs, body in a straight line."},
+  "Constant-Tension Cable Lateral Raise":{c:"Don’t let the handle drop to your side between reps; keep the delt working the whole set."},
+  "Constant-Tension Machine Lateral Raise":{c:"Stop just short of the bottom each rep so the weight never rests on the stack."},
+  "DB Bench Press":{c:"Shoulder blades pinned, lower the dumbbells to the sides of your chest, press up and slightly in."},
+  "DB Bench Press (No Leg Drive)":{c:"Legs up or straight out so you can’t push through your feet. Keep the upper back tight."},
+  "DB Bulgarian Split Squat":{c:"Rear foot on a bench, dumbbells at your sides, sink deep and drive through the front heel."},
+  "DB Curl":{c:"Elbows at your sides, palms turning up as you curl, lower all the way."},
+  "DB Curl 21's":{c:"Three chunks of 7: bottom half, top half, then full range. No rest between."},
+  "DB Floor Skull Crusher":{c:"Lying on the floor, lower the dumbbells beside your head until your triceps touch the floor, then extend."},
+  "DB Flye":{c:"Slight elbow bend locked in, open wide into a deep chest stretch, then hug the dumbbells back up."},
+  "DB French Press":{c:"One dumbbell held in both hands overhead, lower it behind your head for a deep stretch, then extend."},
+  "DB Lateral Raise":{c:"Slight lean forward, lead with the elbows, and stop around shoulder height."},
+  "DB RDL":{c:"Dumbbells close to your legs, hips back, flat back, stretch the hamstrings, then stand tall."},
+  "DB Shoulder Press":{c:"Dumbbells start around ear height, press up and slightly in without arching your back."},
+  "DB Shrug":{c:"Shrug straight up toward your ears, pause, and lower fully. No rolling."},
+  "DB Skull Crusher (12-15 reps)":{c:"Upper arms angled slightly back, lower the dumbbells beside your head, extend fully. Note the higher rep target."},
+  "DB Step-Up":{c:"Whole foot on the box, drive through that heel, and try not to push off the back leg."},
+  "DB Triceps Kickback":{c:"Upper arm parallel to the floor and still; straighten the elbow fully and squeeze."},
+  "Deficit Push Up":{c:"Hands on plates or handles so your chest can sink below hand level for a deeper stretch."},
+  "Flat-To-Incline DB Flye":{c:"A flye done across flat and incline bench angles. Keep a fixed elbow bend and get a deep chest stretch at every angle."},
+  "Goblet Squat":{c:"Dumbbell held at your chest, elbows inside your knees at the bottom, torso tall."},
+  "Helms Row":{c:"Chest on an incline bench’s top edge, standing, and row the dumbbells strictly without lifting your chest."},
+  "High-Bar Box Squat":{c:"Bar high on your traps, sit back to the box with control, stay tight, and drive up without rocking."},
+  "Incline Chest-Supported DB Row":{c:"Chest on an incline bench, let the dumbbells hang for a stretch, then row your elbows back."},
+  "Incline DB Press":{c:"Bench around 30–45°, lower to your upper chest, press up and slightly in."},
+  "Incline Machine Press":{c:"Seat so the handles line up with your upper chest; press without shrugging."},
+  "Inverse Zottman Curl":{c:"Curl up with a neutral grip, turn palms up at the top, and lower slowly."},
+  "Kneeling Modified Push Up":{c:"Knees down, body straight from knees to head, chest to the floor each rep."},
+  "Lat Pulldown":{c:"Chest up, drive your elbows down to your sides, and let your arms fully stretch at the top."},
+  "Low Incline Machine Press":{c:"Low incline setting, press without shrugging, full stretch at the bottom."},
+  "Low Incline Smith Machine Press":{c:"Bench at about 15–30°, lower to your upper chest, press without letting your shoulders roll forward."},
+  "Lying Leg Curl":{c:"Hips pressed into the pad, curl all the way, and lower under control."},
+  "Machine Chest Press":{c:"Handles at mid-chest height, shoulder blades back, press and let your chest stretch on the return."},
+  "Machine Chest Press (No Leg Drive)":{c:"Feet off the floor or up on the seat so the chest does all the pushing."},
+  "Machine Crunch":{c:"Curl your ribs toward your hips, pause, and resist on the way back."},
+  "Machine Pulldown":{c:"Chest up, elbows down to your sides, full stretch at the top."},
+  "Machine Squat":{c:"Feet mid-platform, control the descent, push through your whole foot."},
+  "Meadows Row":{c:"Landmine bar, staggered stance, row with one arm using an overhand grip on the bar end."},
+  "Neutral-Grip Pull-Up":{c:"Palms facing each other, pull your chest toward the handles, lower to a full hang."},
+  "Nordic Ham Curl":{c:"Anchor your heels and lower your body forward as slowly as you can, using your hands to catch and push back up."},
+  "Omni-Grip Pull-Up":{c:"Change grip each set (wide, medium, close) as the original exercise does."},
+  "Pause DB Bulgarian Split Squat":{c:"Same as a split squat, with a 2-second pause at the bottom of each rep."},
+  "Pause Hack Squat":{c:"Lighter than your top set, 2-second pause at the bottom, stay tight in the pause."},
+  "Pec Deck":{c:"Slight elbow bend, bring the handles together in front, and let the chest stretch on the way back."},
+  "Plank":{c:"Elbows under your shoulders, glutes squeezed, body in a straight line."},
+  "Plate Shrug":{c:"Hold plates at your sides and shrug straight up, pause, then lower fully."},
+  "Plate-Weighted Crunch":{c:"Plate on your chest, curl your ribs toward your hips, lower slowly."},
+  "Reverse Cable Flye":{c:"Cables crossed in front at shoulder height, sweep your arms out wide with the rear delts."},
+  "Single-Arm Cable Tricep Kickback":{c:"Hinge forward, upper arm still, extend the elbow fully against the cable."},
+  "Single-Arm DB Row":{c:"Hand and knee on a bench, flat back, row the dumbbell toward your hip."},
+  "Single-Arm Row":{c:"Brace on a bench, row toward your hip, and let the lat stretch at the bottom."},
+  "Single-Arm Tricep Pressdown":{c:"One handle, elbow pinned at your side, extend fully and control the return."},
+  "Standing Calf Raise":{c:"Pause in the stretched bottom position, then rise as high as possible onto your big toe."},
+  "Standing DB Arnold Press":{c:"Start palms facing you at chin height, rotate them forward as you press overhead."},
+  "T-Bar Row":{c:"Hinge with a flat back, row to your stomach, squeeze, and lower to a full stretch."},
+  "Trap Bar Deadlift":{c:"Stand in the centre of the bar, chest up, push the floor away and lock out with your glutes."},
+  "Triceps Pressdown":{c:"Elbows pinned at your sides, extend fully and squeeze, then let the bar come up under control."},
+  "Triceps Pressdown (12-15 reps)":{c:"Elbows pinned, full lockout. Note the higher rep target as a substitute."},
+  "Underhand Lat Pulldown":{c:"Underhand grip about shoulder-width, pull to your upper chest, elbows close to your sides."},
+  "Wide-Grip Machine Row":{c:"Wide handles, elbows flared, pull toward your upper chest to hit the upper back."},
+  "Wide-Grip T-Bar Row":{c:"Wide handle, elbows out, pull to your lower chest and squeeze the upper back."}
+};
+
+const PHASES = {
+  1:{name:"Base hypertrophy", sub:"Moderate volume, moderate intensity", weeks:"Weeks 1–6"},
+  2:{name:"Maximum effort", sub:"Low volume, high intensity", weeks:"Weeks 7–10"},
+  3:{name:"Supercompensation", sub:"High volume, moderate intensity", weeks:"Weeks 11–13"}
+};
+const DELOAD = {
+  semi:"Semi-deload week. Train a bit lighter, stay shy of failure, and let your body catch up before the next block.",
+  full:"Full deload week. Go lighter and keep every set well short of failure. After this, restart at Week 1 or move on."
+};
+const DAY_SLUG = ["legs","push","pull","full-body"];
+const DAY_NAME = ["Legs","Push","Pull","Full Body"];
+const TOTAL = P.length * 4;
+
+const S = {
+  lifters:[{id:"p1",name:"Logan"},{id:"p2",name:"Kyle"}], unit:"lb", me:"p1",
+  logs:{}, selWeek:null, mode:"connecting", readonly:false, stale:false, metric:"e1rm", progEx:null,
+  openNotes:{}, openInfo:{}
+};
+let DB = null;
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dash = s => String(s).replace(/(\d)\s*-\s*(\d)/g, "$1–$2");
+const today = () => { const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const fmtDate = s => { if(!s) return ""; const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString(undefined,{month:"short",day:"numeric"}); };
+const phVar = p => `var(--p${p})`;
+const onPh = p => p===3 ? "var(--on-p3)" : "var(--on-ph)";
+function ls(k, v){ try { if(v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e){ return null; } }
+const lifter = id => S.lifters.find(l => l.id === id) || {id, name:"Lifter"};
+const other = () => S.lifters.find(l => l.id !== S.me);
+const logId = (lid,w,d) => `${lid}-w${w}-d${d}`;
+const keyOf = (w,d) => (w-1)*4 + d;
+const isHold = e => /hold/i.test(e.reps) || /stretch/i.test(e.name);
+const setCount = e => Math.max(1, parseInt(e.sets,10) || 1);
+const exNames = e => [e.name, ...e.subs];
+function repTargets(e){
+  const n = setCount(e);
+  const parts = String(e.reps).split(",").map(s => s.trim());
+  return Array.from({length:n}, (_,i) => parts.length === n ? parts[i] : (parts.length > 1 ? parts[Math.min(i, parts.length-1)] : e.reps));
+}
+function restSecs(e){
+  const m = String(e.rest).match(/(\d+(?:\.\d+)?)/);
+  if(!m) return 0;
+  return Math.round(parseFloat(m[1]) * 60);
+}
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("on"), 2600); }
+
+/* ---------- log model ---------- */
+function skeleton(lid,w,d){
+  const day = P[w-1].days[d];
+  return { lifter:lid, week:w, day:d, done:false, date:null, note:"",
+    ex: day.ex.map(e => ({ sub:0, note:"", sets: Array.from({length:setCount(e)}, () => ({w:"", r:"", ok:false})) })) };
+}
+function getLog(lid,w,d){ return S.logs[logId(lid,w,d)] || null; }
+function ensureLog(lid,w,d){
+  const id = logId(lid,w,d);
+  if(!S.logs[id]) S.logs[id] = skeleton(lid,w,d);
+  const L = S.logs[id], day = P[w-1].days[d];
+  while(L.ex.length < day.ex.length) L.ex.push(skeleton(lid,w,d).ex[L.ex.length]);
+  return L;
+}
+function hasData(xs){ return xs && xs.sets && xs.sets.some(s => s.ok || String(s.w).trim() || String(s.r).trim()); }
+function logStarted(L){ return !!L && (L.done || L.ex.some(hasData)); }
+function exComplete(xs){ return xs && xs.sets.length && xs.sets.every(s => s.ok); }
+
+/* find most recent logged entry of an exercise (by performed name) for a lifter */
+function findEntries(lid, name){
+  const out = [];
+  for(const id in S.logs){
+    const L = S.logs[id];
+    if(L.lifter !== lid) continue;
+    const day = P[L.week-1] && P[L.week-1].days[L.day];
+    if(!day) continue;
+    L.ex.forEach((xs,i) => {
+      const e = day.ex[i]; if(!e || !hasData(xs)) return;
+      if(exNames(e)[xs.sub || 0] === name) out.push({key:keyOf(L.week,L.day), week:L.week, day:L.day, date:L.date, xs, e});
+    });
+  }
+  return out.sort((a,b) => a.key - b.key);
+}
+function lastBefore(lid, name, key, inclusive){
+  const list = findEntries(lid, name).filter(x => inclusive ? x.key <= key : x.key < key);
+  return list[list.length-1] || null;
+}
+function setsText(xs, hold){
+  if(hold) return xs.sets.filter(s=>s.ok).length + " done";
+  return xs.sets.filter(s => String(s.w).trim() || String(s.r).trim())
+    .map(s => `${String(s.w).trim() || "–"} × ${String(s.r).trim() || "–"}`).join(", ");
+}
+
+/* ---------- persistence ---------- */
+const saveTimers = {}, writing = {}, again = {}, dirty = {};
+function touch(id){
+  const L = S.logs[id]; if(!L) return;
+  if(!L.date) L.date = today();
+  L.updatedAt = Date.now();
+  dirty[id] = true;
+  clearTimeout(saveTimers[id]);
+  saveTimers[id] = setTimeout(() => flush(id), 600);
+}
+function saveLocal(){ ls("ppl-local-logs", JSON.stringify(S.logs)); }
+async function flush(id){
+  if(S.mode !== "db"){ saveLocal(); dirty[id] = false; return; }
+  if(writing[id]){ again[id] = true; return; }
+  writing[id] = true;
+  try { await DB.collection("logs").doc(id).set(JSON.parse(JSON.stringify(S.logs[id]))); }
+  catch(e){ writeErr(e); }
+  writing[id] = false;
+  if(again[id]){ again[id] = false; return flush(id); }
+  dirty[id] = false;
+}
+function writeErr(e){
+  const c = e && e.code;
+  if(c === "invalid_argument"){ S.readonly = true; toast("You can view this log but not save to it."); render(); }
+  else if(c === "quota_exceeded"){ toast("Storage is full, so this change wasn’t saved."); }
+  else if(c === "unavailable"){ toast("Couldn’t reach the server. Your change will retry on your next edit."); }
+  else toast("This change wasn’t saved. Try again in a moment.");
+}
+async function saveSettingsData(){
+  const data = {lifters:S.lifters, unit:S.unit};
+  if(S.mode === "db"){
+    try { await DB.doc("meta/settings").set(JSON.parse(JSON.stringify(data))); } catch(e){ writeErr(e); }
+  } else ls("ppl-local-settings", JSON.stringify(data));
+}
+function loadLocal(){
+  try { const l = JSON.parse(ls("ppl-local-logs") || "{}"); if(l && typeof l === "object") S.logs = l; } catch(e){}
+  try { const s = JSON.parse(ls("ppl-local-settings") || "null"); if(s){ if(Array.isArray(s.lifters)) S.lifters = s.lifters; if(s.unit) S.unit = s.unit; } } catch(e){}
+}
+
+/* ---------- next-up logic ---------- */
+function nextUp(lid){
+  for(let w=1; w<=P.length; w++) for(let d=0; d<4; d++){
+    const L = getLog(lid,w,d);
+    if(!L || !L.done) return {w,d,started:logStarted(L)};
+  }
+  return null;
+}
+function weekDone(lid,w){ let n=0; for(let d=0; d<4; d++){ const L=getLog(lid,w,d); if(L && L.done) n++; } return n; }
+function doneCount(lid){ let n=0; for(const id in S.logs){ const L=S.logs[id]; if(L.lifter===lid && L.done) n++; } return n; }
+
+/* ---------- routing ---------- */
+function route(){
+  const h = location.hash.replace(/^#/, "");
+  if(h === "progress") return {name:"progress"};
+  const m = h.match(/^week-(\d{1,2})-(legs|push|pull|full-body)$/);
+  if(m){ const w = +m[1], d = DAY_SLUG.indexOf(m[2]); if(w>=1 && w<=P.length) return {name:"workout", w, d}; }
+  return {name:"home"};
+}
+const wHash = (w,d) => `#week-${w}-${DAY_SLUG[d]}`;
+
+/* ---------- render ---------- */
+function editing(){ const a = document.activeElement; return a && $("#app").contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); }
+let needRender = false;
+function softRender(){ if(editing()) { needRender = true; return; } render(); }
+document.addEventListener("focusout", () => setTimeout(() => { if(needRender && !editing()){ needRender = false; render(); } }, 0));
+
+function renderTop(){
+  $("#lifterSeg").innerHTML = S.lifters.map(l => `<button data-me="${l.id}" aria-pressed="${l.id===S.me}">${esc(l.name)}</button>`).join("");
+  const r = route();
+  if(r.name !== "progress") $("#tabProgram").setAttribute("aria-current","page"); else $("#tabProgram").removeAttribute("aria-current");
+  if(r.name === "progress") $("#tabProgress").setAttribute("aria-current","page"); else $("#tabProgress").removeAttribute("aria-current");
+}
+
+function banners(){
+  let b = "";
+  if(S.readonly) b += `<p class="banner">You can view this log but can’t save to it. Ask the owner to give you edit access.</p>`;
+  if(S.stale) b += `<p class="banner">Can’t reach your saved data right now. What you see may be out of date.</p>`;
+  return b;
+}
+
+function render(){
+  renderTop();
+  const r = route();
+  const app = $("#app");
+  const y = window.scrollY;
+  if(r.name === "workout") app.innerHTML = viewWorkout(r.w, r.d);
+  else if(r.name === "progress") app.innerHTML = viewProgress();
+  else app.innerHTML = viewHome();
+  window.scrollTo(0, y);
+}
+
+function viewHome(){
+  const me = lifter(S.me), nx = nextUp(S.me);
+  if(S.selWeek == null) S.selWeek = nx ? nx.w : P.length;
+  let h = banners();
+  if(nx){
+    const ph = P[nx.w-1].phase;
+    h += `<section class="hero" style="--ph:${phVar(ph)}">
+      <div class="hero-bar" aria-hidden="true"></div>
+      <div>
+        <p class="hero-k">Up next for ${esc(me.name)}</p>
+        <h1 class="hero-day">${DAY_NAME[nx.d]}</h1>
+        <p class="hero-meta"><b>Week ${nx.w}</b> of ${P.length}, ${PHASES[ph].name.toLowerCase()}${P[nx.w-1].deload ? " (deload)" : ""}</p>
+        <a class="btn" href="${wHash(nx.w,nx.d)}">${nx.started ? "Continue workout" : "Start workout"}</a>
+      </div></section>`;
+  } else {
+    h += `<section class="hero" style="--ph:var(--ok)"><div class="hero-bar"></div><div>
+      <p class="hero-k">${esc(me.name)}</p><h1 class="hero-day">Done</h1>
+      <p class="hero-meta">All ${TOTAL} workouts logged. Run it back from Week 1 or check your progress.</p>
+      <a class="btn" href="#progress">See progress</a></div></section>`;
+  }
+  h += `<h2 class="sec">13 weeks</h2><div class="plates" role="group" aria-label="Choose a week">`;
+  P.forEach(wk => {
+    const n = weekDone(S.me, wk.n);
+    h += `<button class="plate${wk.deload ? " deload" : ""}" data-week="${wk.n}" aria-pressed="${wk.n===S.selWeek}" style="--ph:${phVar(wk.phase)};--fill:${n*25}%" aria-label="Week ${wk.n}, ${n} of 4 done${wk.deload ? ", deload" : ""}">
+      <span class="plate-body"><span class="plate-fill"></span></span><span class="plate-n">${wk.n}</span></button>`;
+  });
+  h += `</div><ul class="legend">${[1,2,3].map(p => `<li style="--ph:${phVar(p)}"><span class="sw"></span>${PHASES[p].name}</li>`).join("")}<li>Short plate = deload</li></ul>`;
+
+  const wk = P[S.selWeek-1], ph = wk.phase;
+  h += `<div class="week-head" style="--ph:${phVar(ph)}"><h2 class="sec">Week ${wk.n}</h2></div>
+    <p class="week-sub">${PHASES[ph].name}: ${PHASES[ph].sub.toLowerCase()}</p>`;
+  if(wk.deload) h += `<p class="note" style="--ph:${phVar(ph)}">${DELOAD[wk.deload]}</p>`;
+  h += `<div class="days">`;
+  wk.days.forEach((day,d) => {
+    const who = S.lifters.map(l => {
+      const L = getLog(l.id, wk.n, d);
+      const cls = L && L.done ? "done" : logStarted(L) ? "half" : "";
+      const st = L && L.done ? "done" : logStarted(L) ? "in progress" : "not started";
+      return `<span class="${cls}" title="${esc(l.name)}: ${st}" aria-label="${esc(l.name)}: ${st}">${esc((l.name||"?").trim().charAt(0).toUpperCase())}</span>`;
+    }).join("");
+    const mine = getLog(S.me, wk.n, d);
+    const sub = mine && mine.done && mine.date ? `Done ${fmtDate(mine.date)}` : `${day.ex.length} exercises`;
+    h += `<a class="day" href="${wHash(wk.n,d)}" style="--ph:${phVar(ph)}"><span class="day-name">${DAY_NAME[d]}<small>${sub}</small></span><span class="who">${who}</span></a>`;
+    if(d === 2 || d === 3) h += `<p class="rest-div">1–2 rest days</p>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+function viewWorkout(w, d){
+  const wk = P[w-1], day = wk.days[d], ph = wk.phase;
+  const L = getLog(S.me, w, d) || skeleton(S.me, w, d);
+  const key = keyOf(w,d), oth = other();
+  const doneEx = day.ex.filter((e,i) => exComplete(L.ex[i])).length;
+  const ro = S.readonly ? " disabled" : "";
+  let h = banners();
+  h += `<div style="--ph:${phVar(ph)}">
+    <button class="back" data-go="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Week ${w}</button>
+    <div class="w-head"><div class="hero-bar" aria-hidden="true"></div><div>
+      <h1 class="hero-day">${DAY_NAME[d]}</h1>
+      <p class="w-meta">Week ${w}, ${PHASES[ph].name.toLowerCase()}. ${esc(lifter(S.me).name)}${L.date ? `, ${fmtDate(L.date)}` : ""}</p>
+    </div></div>`;
+  if(wk.deload) h += `<p class="note" style="margin-top:12px">${DELOAD[wk.deload]}</p>`;
+  h += `<div class="prog" aria-hidden="true"><i style="width:${Math.round(doneEx/day.ex.length*100)}%"></i></div>
+    <p class="prog-l">${doneEx} of ${day.ex.length} exercises complete</p>`;
+
+  day.ex.forEach((e,i) => {
+    const xs = L.ex[i] || skeleton(S.me,w,d).ex[i];
+    const hold = isHold(e), names = exNames(e), name = names[xs.sub||0];
+    const reps = repTargets(e);
+    const prev = lastBefore(S.me, name, key, false);
+    const otherLast = oth ? lastBefore(oth.id, name, key, true) : null;
+    const nextE = day.ex[i+1], prevE = day.ex[i-1];
+    let cls = "ex";
+    if(e.ss && nextE && nextE.ss && nextE.ss[0] === e.ss[0]) cls += " ss-first";
+    if(e.ss && prevE && prevE.ss && prevE.ss[0] === e.ss[0]) cls += " ss-next";
+    if(exComplete(xs)) cls += " complete";
+    h += `<section class="${cls}" data-ex="${i}">
+      <div class="ex-top"><span class="ex-num">${i+1}</span><div style="flex:1">
+        ${e.ss ? `<span class="ss-tag">Superset ${e.ss}${e.ss.endsWith("1") ? ": go straight into the next one" : ""}</span>` : ""}
+        <h3 class="ex-name">${esc(name)}</h3></div>
+        <button class="info-btn" data-info aria-expanded="${!!S.openInfo[i]}" aria-controls="info-${i}" aria-label="How to do ${esc(name)}">i</button></div>
+      ${S.openInfo[i] ? infoPanel(e, name, xs, day.page, i) : ""}
+      <ul class="chips">
+        <li><b>${e.sets} × ${esc(dash(e.reps))}</b></li>
+        ${e.rpe && e.rpe !== "N/A" ? `<li>RPE <b>${esc(dash(e.rpe))}</b></li>` : ""}
+        ${e.rest && restSecs(e) ? `<li>Rest <b>${esc(dash(e.rest))}</b></li>` : (e.ss && e.ss.endsWith("1") ? `<li>No rest</li>` : "")}
+        ${e.wu && e.wu !== "0" ? `<li>${esc(dash(e.wu))} warm-up${e.wu === "1" ? "" : "s"}</li>` : ""}
+      </ul>`;
+    if(e.subs.length) h += `<div class="subs" role="group" aria-label="Exercise choice">${names.map((n,k) =>
+      `<button data-sub="${k}" aria-pressed="${(xs.sub||0)===k}"${ro}>${k===0 ? "As written" : esc(n)}</button>`).join("")}</div>`;
+    if(prev) h += `<p class="hint">Last time, week ${prev.week}: <b>${esc(setsText(prev.xs, hold))}</b></p>`;
+    if(otherLast) h += `<p class="hint">${esc(oth.name)}, week ${otherLast.week}: <b>${esc(setsText(otherLast.xs, hold))}</b></p>`;
+    h += `<table class="sets"><thead><tr><th scope="col">Set</th>${hold ? `<th scope="col">Hold</th>` : `<th scope="col">${S.unit}</th><th scope="col">Reps</th>`}<th scope="col"><span class="vh">Done</span></th></tr></thead><tbody>`;
+    xs.sets.forEach((s,j) => {
+      const extra = j >= setCount(e);
+      const pw = prev && prev.xs.sets[j] && String(prev.xs.sets[j].w).trim() ? prev.xs.sets[j].w : (prev ? (prev.xs.sets.find(x => String(x.w).trim()) || {}).w || "" : "");
+      h += `<tr class="${s.ok ? "row-ok" : ""}" data-set="${j}"><td>${j+1}</td>`;
+      if(hold) h += `<td class="hold-cell">${esc(dash(e.reps.replace(/\s*HOLD/i," hold")))}</td>`;
+      else h += `<td><input class="num" inputmode="decimal" enterkeyhint="next" data-f="w" value="${esc(s.w)}" placeholder="${esc(pw || "–")}" aria-label="Set ${j+1} weight in ${S.unit}"${ro}></td>
+        <td><input class="num" inputmode="numeric" enterkeyhint="done" data-f="r" value="${esc(s.r)}" placeholder="${esc(extra ? "–" : dash(reps[j] || e.reps))}" aria-label="Set ${j+1} reps"${ro}></td>`;
+      h += `<td>${extra && !s.ok ? `<button class="rm" data-rmset="${j}" aria-label="Remove set ${j+1}"${ro}>×</button>` : `<button class="tick" data-tick="${j}" aria-pressed="${!!s.ok}" aria-label="Set ${j+1} done"${ro}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>`}</td></tr>`;
+    });
+    h += `</tbody></table><div class="ex-actions">
+      ${hold ? "" : `<button class="link" data-addset${ro}>Add a set</button>`}
+      ${S.openNotes[i] || xs.note ? "" : `<button class="link" data-opennote${ro}>Add a note</button>`}</div>
+      ${S.openNotes[i] || xs.note ? `<label class="vh" for="note-${i}">Note for ${esc(name)}</label><textarea id="note-${i}" data-note placeholder="Seat height, grip, how it felt…"${ro}>${esc(xs.note)}</textarea>` : ""}
+    </section>`;
+  });
+
+  h += `<label class="f" for="sessNote">Workout notes</label>
+    <textarea id="sessNote" data-sessnote placeholder="Energy, sleep, anything worth remembering next week"${ro}>${esc(L.note)}</textarea>
+    <div class="finish">`;
+  if(L.done) h += `<p class="done-note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Workout complete${L.date ? `, ${fmtDate(L.date)}` : ""}</p>
+    <button class="btn ghost" data-finish="0"${ro}>Reopen workout</button>`;
+  else h += `<button class="btn" data-finish="1"${ro}>Finish workout</button>`;
+  h += `</div>`;
+  const nx = d < 3 ? {w, d:d+1} : (w < P.length ? {w:w+1, d:0} : null);
+  if(nx) h += `<a class="btn ghost" style="width:100%;margin-top:4px" href="${wHash(nx.w,nx.d)}">Next: week ${nx.w} ${DAY_NAME[nx.d].toLowerCase()}</a>`;
+  h += `</div>`;
+  return h;
+}
+
+function infoPanel(e, name, xs, page, i){
+  const own = CUES[name], base = CUES[e.name];
+  const cue = own || base;
+  const method = base && base.m;
+  let h = `<div class="info" id="info-${i}">`;
+  if(method) h += `<p class="info-k">How the sets work</p><p>${esc(method)}</p>`;
+  if(cue) h += `<p class="info-k">Form cues${!own && name !== e.name ? ` (for ${esc(e.name)})` : ""}</p><p>${esc(cue.c)}</p>`;
+  h += `</div>`;
+  return h;
+}
+
+/* ---------- progress ---------- */
+function e1rm(w, r){ w = parseFloat(w); r = parseInt(r,10); if(!(w>0) || !(r>0)) return null; return r === 1 ? w : w * (1 + r/30); }
+function bestOf(xs, metric){
+  let best = null;
+  xs.sets.forEach(s => {
+    const v = metric === "e1rm" ? (parseInt(s.r,10) <= 15 ? e1rm(s.w, s.r) : null) : (parseFloat(s.w) > 0 ? parseFloat(s.w) : null);
+    if(v != null && (best == null || v > best)) best = v;
+  });
+  return best;
+}
+function viewProgress(){
+  let h = banners();
+  h += `<h1 class="hero-day" style="font-size:clamp(56px,15vw,84px);margin:22px 0 4px">Progress</h1>`;
+  h += `<div class="stats">${S.lifters.map(l => {
+    const n = doneCount(l.id), nx = nextUp(l.id);
+    return `<div class="stat"><p>${esc(l.name)}</p><strong>${n}<small> / ${TOTAL}</small></strong><p>${nx ? `Next: week ${nx.w} ${DAY_NAME[nx.d].toLowerCase()}` : "Program complete"}</p></div>`;
+  }).join("")}</div>`;
+
+  const counts = {};
+  for(const id in S.logs){
+    const L = S.logs[id]; const day = P[L.week-1] && P[L.week-1].days[L.day]; if(!day) continue;
+    L.ex.forEach((xs,i) => { const e = day.ex[i]; if(!e || isHold(e) || !hasData(xs)) return; const n = exNames(e)[xs.sub||0]; counts[n] = (counts[n]||0) + 1; });
+  }
+  const names = Object.keys(counts).sort((a,b) => counts[b]-counts[a] || a.localeCompare(b));
+  if(!names.length) return h + `<div class="empty"><b>Nothing to chart yet.</b> Log a few sets and each lift gets its own trend line here, with both of you side by side.</div>`;
+  if(!S.progEx || !counts[S.progEx]) S.progEx = names[0];
+
+  h += `<label class="f" for="exPick">Exercise</label><select id="exPick">${names.map(n => `<option${n===S.progEx?" selected":""}>${esc(n)}</option>`).join("")}</select>
+    <div class="seg" role="group" aria-label="Measure" style="margin-top:12px"><button data-metric="e1rm" aria-pressed="${S.metric==="e1rm"}">Estimated 1RM</button><button data-metric="top" aria-pressed="${S.metric==="top"}">Heaviest set</button></div>`;
+
+  const series = S.lifters.map((l,k) => ({l, k, pts: findEntries(l.id, S.progEx).map(x => ({key:x.key, week:x.week, day:x.day, v:bestOf(x.xs, S.metric), x})).filter(p => p.v != null)}));
+  const all = series.flatMap(s => s.pts);
+  if(!all.length){
+    h += `<div class="empty">No weights logged for this lift yet.</div>`;
+  } else {
+    const W = 340, H = 190, pl = 40, pr = 14, pt = 12, pb = 26;
+    let kmin = Math.min(...all.map(p=>p.key)), kmax = Math.max(...all.map(p=>p.key));
+    if(kmin === kmax){ kmin -= 1; kmax += 1; }
+    let vmin = Math.min(...all.map(p=>p.v)), vmax = Math.max(...all.map(p=>p.v));
+    const pad = Math.max(5, (vmax - vmin) * 0.15); vmin = Math.max(0, vmin - pad); vmax = vmax + pad;
+    const X = k => pl + (k - kmin) / (kmax - kmin) * (W - pl - pr);
+    const Yv = v => pt + (1 - (v - vmin) / (vmax - vmin)) * (H - pt - pb);
+    const colors = ["var(--ink)","var(--l2)"];
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(S.progEx)} trend">`;
+    for(let g=0; g<=3; g++){ const v = vmin + (vmax-vmin)*g/3, y = Yv(v);
+      svg += `<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${pl-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="Barlow, sans-serif">${Math.round(v)}</text>`; }
+    const wk0 = Math.floor(kmin/4)+1, wk1 = Math.floor(kmax/4)+1;
+    const single = new Set(all.map(p=>p.key)).size === 1;
+    svg += single ? "" : `<text x="${pl}" y="${H-6}" font-size="11" fill="var(--muted)" font-family="Barlow, sans-serif">Wk ${Math.max(1,wk0)}</text><text x="${W-pr}" y="${H-6}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="Barlow, sans-serif">Wk ${Math.min(P.length,wk1)}</text>`;
+    series.forEach(s => {
+      if(!s.pts.length) return;
+      const c = colors[s.k] || "var(--muted)";
+      const d = s.pts.map((p,i) => `${i?"L":"M"}${X(p.key).toFixed(1)},${Yv(p.v).toFixed(1)}`).join(" ");
+      svg += `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" ${s.k ? 'stroke-dasharray="5 4"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`;
+      s.pts.forEach(p => { svg += `<circle cx="${X(p.key).toFixed(1)}" cy="${Yv(p.v).toFixed(1)}" r="3.5" fill="var(--surface)" stroke="${c}" stroke-width="2"/>`; });
+    });
+    svg += `</svg>`;
+    h += `<div class="chart"><div class="chart-key">${series.map(s => `<span><i style="background:${colors[s.k]}"></i>${esc(s.l.name)}${s.pts.length ? `: best ${Math.round(Math.max(...s.pts.map(p=>p.v)))} ${S.unit}` : ": no data"}</span>`).join("")}</div>${svg}</div>`;
+
+    const keys = [...new Set(all.map(p=>p.key))].sort((a,b)=>b-a);
+    h += `<div class="hist">${keys.map(k => {
+      const w = Math.floor(k/4)+1, d = k%4;
+      return `<div class="hist-row"><div class="wk">Wk ${w}<small>${DAY_NAME[d]}</small></div><div>${series.map(s => {
+        const p = s.pts.find(p => p.key === k); return p ? `<p><span>${esc(s.l.name)}:</span> ${esc(setsText(p.x.xs,false))}</p>` : "";
+      }).join("")}</div></div>`;
+    }).join("")}</div>`;
+    h += `<p class="small-print">Estimated 1RM uses the Epley formula on sets of 15 reps or fewer. It’s a trend line, not a max to test.</p>`;
+  }
+  return h;
+}
+
+/* ---------- rest timer ---------- */
+const T = { end:0, total:0, iv:null, ctx:null };
+function beep(){
+  try {
+    if(!T.ctx) return;
+    const o = T.ctx.createOscillator(), g = T.ctx.createGain();
+    o.frequency.value = 880; o.connect(g); g.connect(T.ctx.destination);
+    g.gain.setValueAtTime(0.0001, T.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.3, T.ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, T.ctx.currentTime + 0.5);
+    o.start(); o.stop(T.ctx.currentTime + 0.55);
+  } catch(e){}
+}
+function startTimer(secs, label){
+  if(!secs) return;
+  try { T.ctx = T.ctx || new (window.AudioContext || window.webkitAudioContext)(); T.ctx.resume && T.ctx.resume(); } catch(e){}
+  T.end = Date.now() + secs*1000; T.fired = false;
+  $("#timerL").textContent = label;
+  $("#timer").classList.add("on"); $("#timer").classList.remove("ready");
+  clearInterval(T.iv); tickTimer(); T.iv = setInterval(tickTimer, 250);
+}
+function tickTimer(){
+  const left = Math.round((T.end - Date.now())/1000);
+  const a = Math.abs(left);
+  $("#timerT").textContent = (left < 0 ? "+" : "") + Math.floor(a/60) + ":" + String(a%60).padStart(2,"0");
+  if(left <= 0 && !T.fired){ T.fired = true; $("#timer").classList.add("ready"); $("#timerL").textContent = "Next set"; beep(); }
+}
+function stopTimer(){ clearInterval(T.iv); $("#timer").classList.remove("on","ready"); }
+$("#timerSkip").onclick = stopTimer;
+$("#timerAdd").onclick = () => { T.end = Math.max(T.end, Date.now()) + 30000; T.fired = false; $("#timer").classList.remove("ready"); tickTimer(); };
+
+/* ---------- events ---------- */
+function curWorkout(){ const r = route(); return r.name === "workout" ? r : null; }
+
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("button, a"); if(!t) return;
+  if(t.dataset.me){ S.me = t.dataset.me; ls("ppl-me", S.me); S.selWeek = null; render(); return; }
+  if(t.dataset.week){ S.selWeek = +t.dataset.week; render(); return; }
+  if(t.dataset.go !== undefined){ location.hash = t.dataset.go; return; }
+  if(t.dataset.metric){ S.metric = t.dataset.metric; render(); return; }
+  const r = curWorkout(); if(!r) return;
+  const exEl0 = t.closest("[data-ex]");
+  if(t.dataset.info !== undefined && exEl0){ const k = +exEl0.dataset.ex; S.openInfo[k] = !S.openInfo[k]; render(); return; }
+  if(S.readonly) return;
+  const exEl = exEl0;
+  const id = logId(S.me, r.w, r.d);
+  if(t.dataset.finish !== undefined){
+    const L = ensureLog(S.me, r.w, r.d);
+    L.done = t.dataset.finish === "1";
+    if(L.done){ L.completedAt = Date.now(); stopTimer(); }
+    touch(id);
+    if(L.done){ toast("Workout saved. Nice work."); location.hash = ""; S.selWeek = null; }
+    render(); return;
+  }
+  if(!exEl) return;
+  const i = +exEl.dataset.ex, L = ensureLog(S.me, r.w, r.d), xs = L.ex[i], e = P[r.w-1].days[r.d].ex[i];
+  if(t.dataset.sub !== undefined){ xs.sub = +t.dataset.sub; touch(id); render(); return; }
+  if(t.dataset.tick !== undefined){
+    const j = +t.dataset.tick, s = xs.sets[j];
+    s.ok = !s.ok;
+    if(s.ok && !isHold(e)){
+      const row = t.closest("tr");
+      if(!String(s.w).trim()){ const ph = row.querySelector('[data-f="w"]').placeholder; if(ph && ph !== "–") s.w = ph; }
+      if(!String(s.r).trim()){ const pr = row.querySelector('[data-f="r"]').placeholder; if(/^\d+$/.test(pr)) s.r = pr; }
+    }
+    touch(id);
+    if(s.ok){
+      const lastSet = xs.sets.every(x => x.ok);
+      const secs = restSecs(e);
+      if(secs) startTimer(secs, lastSet ? "Rest, then next exercise" : `Rest before set ${j+2}`);
+    }
+    render(); return;
+  }
+  if(t.dataset.addset !== undefined){ const last = xs.sets[xs.sets.length-1] || {}; xs.sets.push({w:last.w||"", r:"", ok:false}); touch(id); render(); return; }
+  if(t.dataset.rmset !== undefined){ xs.sets.splice(+t.dataset.rmset, 1); touch(id); render(); return; }
+  if(t.dataset.opennote !== undefined){ S.openNotes[i] = true; render(); const ta = document.getElementById(`note-${i}`); ta && ta.focus(); return; }
+});
+
+document.addEventListener("input", ev => {
+  const t = ev.target, r = curWorkout();
+  if(t.id === "exPick") return;
+  if(!r || S.readonly) return;
+  const id = logId(S.me, r.w, r.d);
+  if(t.dataset.sessnote !== undefined){ ensureLog(S.me, r.w, r.d).note = t.value; touch(id); return; }
+  const exEl = t.closest("[data-ex]"); if(!exEl) return;
+  const L = ensureLog(S.me, r.w, r.d), xs = L.ex[+exEl.dataset.ex];
+  if(t.dataset.note !== undefined){ xs.note = t.value; touch(id); return; }
+  const tr = t.closest("[data-set]"); if(!tr) return;
+  const v = t.value.replace(",", ".").replace(/[^\d.]/g, "");
+  if(v !== t.value) t.value = v;
+  xs.sets[+tr.dataset.set][t.dataset.f] = v;
+  touch(id);
+});
+document.addEventListener("change", ev => { if(ev.target.id === "exPick"){ S.progEx = ev.target.value; render(); } });
+document.addEventListener("keydown", ev => {
+  if(ev.key !== "Enter" || !ev.target.classList.contains("num")) return;
+  ev.preventDefault();
+  const inputs = [...document.querySelectorAll(".num:not([disabled])")];
+  const n = inputs[inputs.indexOf(ev.target)+1]; n ? n.focus() : ev.target.blur();
+});
+window.addEventListener("hashchange", () => { stopTimerIfLeaving(); S.openNotes = {}; S.openInfo = {}; render(); window.scrollTo(0,0); });
+function stopTimerIfLeaving(){ if(!curWorkout()) stopTimer(); }
+
+/* settings */
+const dlg = $("#settings");
+let pendingUnit = S.unit;
+$("#openSettings").onclick = () => {
+  $("#n1").value = S.lifters[0].name; $("#n2").value = S.lifters[1].name; pendingUnit = S.unit;
+  $("#unitSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === pendingUnit));
+  $("#syncNote").textContent = S.mode === "db"
+    ? "Synced. Names, unit and every logged set are shared with anyone you give edit access to this page."
+    : "";
+  $("#backupBox").hidden = S.mode === "db";
+  ["n1","n2","saveSettings"].forEach(k => $("#"+k).disabled = S.readonly);
+  dlg.showModal ? dlg.showModal() : dlg.setAttribute("open","");
+};
+/* backup: export / import (merge, newest edit wins per workout) */
+$("#exportBtn").onclick = async () => {
+  const data = {app:"ppl-logbook", v:1, exported:new Date().toISOString(), lifters:S.lifters, unit:S.unit, logs:S.logs};
+  const name = `ppl-backup-${today()}.json`;
+  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+  try {
+    const file = new File([blob], name, {type:"application/json"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:"PPL Logbook backup"}); return; }
+  } catch(e){ if(e && e.name === "AbortError") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+};
+$("#importBtn").onclick = () => $("#importFile").click();
+$("#importFile").onchange = async ev => {
+  const f = ev.target.files && ev.target.files[0]; ev.target.value = "";
+  if(!f) return;
+  let data;
+  try { data = JSON.parse(await f.text()); } catch(e){ toast("That file isn’t a PPL Logbook backup."); return; }
+  if(!data || data.app !== "ppl-logbook" || typeof data.logs !== "object"){ toast("That file isn’t a PPL Logbook backup."); return; }
+  let added = 0, updated = 0;
+  for(const id in data.logs){
+    const inc = data.logs[id]; if(!inc || !/^p[12]-w\d+-d\d$/.test(id)) continue;
+    const cur = S.logs[id];
+    if(!cur){ S.logs[id] = inc; added++; }
+    else if((inc.updatedAt || 0) > (cur.updatedAt || 0)){ S.logs[id] = inc; updated++; }
+  }
+  if(Array.isArray(data.lifters) && data.lifters.length === 2){
+    S.lifters = S.lifters.map((l,k) => (/^Lifter \d$/.test(l.name) && data.lifters[k] && data.lifters[k].name) ? {id:l.id, name:data.lifters[k].name} : l);
+  }
+  saveLocal(); await saveSettingsData();
+  dlg.close ? dlg.close() : dlg.removeAttribute("open");
+  render();
+  toast(added + updated ? `Imported ${added + updated} workout${added + updated === 1 ? "" : "s"}.` : "Nothing new in that backup.");
+};
+$("#unitSeg").onclick = e => { const b = e.target.closest("button"); if(!b || S.readonly) return; pendingUnit = b.dataset.u; $("#unitSeg").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); };
+$("#closeSettings").onclick = () => dlg.close ? dlg.close() : dlg.removeAttribute("open");
+$("#saveSettings").onclick = async () => {
+  S.lifters = [{id:"p1", name:$("#n1").value.trim() || "Lifter 1"}, {id:"p2", name:$("#n2").value.trim() || "Lifter 2"}];
+  S.unit = pendingUnit;
+  dlg.close ? dlg.close() : dlg.removeAttribute("open");
+  render(); await saveSettingsData(); toast("Settings saved.");
+};
+
+/* ---------- boot ---------- */
+async function boot(){
+  const m = ls("ppl-me"); if(m === "p1" || m === "p2") S.me = m;
+  render();
+  let db = null, user = null;
+  try { if(window.claude && typeof window.claude.use === "function") [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]); } catch(e){}
+  if(!db){ S.mode = "local"; loadLocal(); render(); return; }
+  DB = db; S.mode = "db";
+  if(user){ try { if(await user.can("data.write") === false) S.readonly = true; } catch(e){} }
+  const timer = setTimeout(() => { S.stale = true; softRender(); }, 10000);
+  db.collection("logs").onSnapshot(snap => {
+    if(!snap.metadata.fromCache){ clearTimeout(timer); S.stale = false; }
+    const next = {};
+    snap.docs.forEach(doc => { const d = doc.data(); if(d) next[doc.id] = JSON.parse(JSON.stringify(d)); });
+    for(const id in S.logs) if(dirty[id] || writing[id]) next[id] = S.logs[id];
+    S.logs = next;
+    softRender();
+  }, err => { clearTimeout(timer); S.stale = true; softRender(); });
+  db.doc("meta/settings").onSnapshot(snap => {
+    if(snap.exists){ const d = snap.data();
+      if(Array.isArray(d.lifters) && d.lifters.length === 2) S.lifters = d.lifters.map(l => ({id:l.id, name:l.name}));
+      if(d.unit === "lb" || d.unit === "kg") S.unit = d.unit; }
+    softRender();
+  }, () => {});
+  render();
+}
+boot();
+</script>
+</body>
+</html>
