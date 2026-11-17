@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lean Bulk Meal Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meal Plan">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f4f6f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1416" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231f7a8c'/%3E%3Cpath d='M38 92h104a52 52 0 0 1-104 0z' fill='%23fff'/%3E%3Crect x='66' y='146' width='48' height='8' rx='4' fill='%23fff'/%3E%3Cpath d='M70 40c-10 12 10 18 0 32M92 34c-10 14 10 22 0 38M114 40c-10 12 10 18 0 32' stroke='%23fff' stroke-width='7' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="touchicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%231f7a8c'/%3E%3Cpath d='M38 92h104a52 52 0 0 1-104 0z' fill='%23fff'/%3E%3Crect x='66' y='146' width='48' height='8' rx='4' fill='%23fff'/%3E%3Cpath d='M70 40c-10 12 10 18 0 32M92 34c-10 14 10 22 0 38M114 40c-10 12 10 18 0 32' stroke='%23fff' stroke-width='7' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f4f6f6;--card:#fff;--text:#172024;--muted:#5d6b72;--line:#dde4e6;--accent:#1f7a8c;--accent-soft:#e3f1f3;--ok:#2e8b57;--p:#c2553f;--c:#b8860b;--f:#6b5fb5;--nav:rgba(255,255,255,.94)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1416;--card:#1a2226;--text:#e8eeef;--muted:#96a5ab;--line:#2b363b;--accent:#5cc0d2;--accent-soft:#17323a;--ok:#5fc48c;--p:#ee8d79;--c:#e2b64a;--f:#a79df0;--nav:rgba(20,27,30,.94)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow-x:hidden}
+main{max-width:640px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) max(14px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 96px) max(14px,env(safe-area-inset-left))}
+h1{font-size:26px;margin:4px 0 2px;letter-spacing:-.3px}
+h2{font-size:18px;margin:22px 0 8px}
+h3{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:16px 0 6px}
+p{margin:6px 0}
+.sub{color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.tab{display:none}.tab.on{display:block}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:12px 0}
+.days button{min-height:48px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:14px}
+.days button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+@media (prefers-color-scheme:dark){.days button.on{color:#06181c}}
+.days button.today:not(.on){border-color:var(--accent);color:var(--accent)}
+.big{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--accent);width:0;transition:width .25s}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.mgrid b{font-size:17px}.mgrid span{font-size:12px;color:var(--muted);display:block}
+.slot{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.slot:first-child{border-top:0}
+.slot .time{flex:0 0 68px;font-size:13px;font-weight:600;color:var(--muted);padding-top:3px}
+.slot .body{flex:1;min-width:0}
+.slot .name{font-weight:600}
+.slot.mark .name{font-weight:500;color:var(--muted);font-size:14px}
+.slot.done .name{text-decoration:line-through;color:var(--muted)}
+.mac{font-size:13px;color:var(--muted);margin-top:2px}
+.mac b{color:var(--text);font-weight:600}
+.link{color:var(--accent);font-size:14px;font-weight:600;display:inline-block;padding:8px 0 2px}
+.chk{flex:0 0 34px;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;color:transparent;margin-top:2px}
+.on>.chk,.done>.chk{background:var(--ok);border-color:var(--ok);color:#fff}
+.rhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%;text-align:left;min-height:48px}
+.rhead .name{font-weight:650;font-size:16px}
+.rhead .arrow{color:var(--muted);font-size:20px;line-height:1.2}
+.tag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:2px 7px;margin-bottom:4px}
+.rbody{display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.open>.rbody{display:block}
+.step{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--accent-soft);border-radius:12px;padding:8px 12px}
+.step button{width:48px;height:48px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:24px;font-weight:600}
+.step .n{font-weight:700;font-size:18px;text-align:center}
+.step .n small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.ing{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.ing:first-of-type{border-top:0}
+.ing .q{flex:0 0 46%;text-align:right;color:var(--muted);font-size:14px}
+.ing .q b{color:var(--text)}
+.ing small{display:block;color:var(--muted);font-size:12.5px}
+ol{padding-left:22px;margin:6px 0}ol li{margin:8px 0}
+.note{background:var(--accent-soft);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
+.item{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:11px 0;border-top:1px solid var(--line);min-height:52px}
+.item:first-child{border-top:0}
+.item .body{flex:1;min-width:0}
+.item.on .t{text-decoration:line-through;color:var(--muted)}
+.item .d{font-size:13.5px;color:var(--muted);margin-top:2px}
+.item .when{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.3px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.reset{font-size:14px;font-weight:600;color:var(--accent);min-height:44px;padding:0 4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{text-align:left;padding:8px 6px 8px 0;border-top:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-top:0}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--nav);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav div{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{min-height:58px;font-size:11.5px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<section class="tab on" id="t-today"></section>
+<section class="tab" id="t-meals"></section>
+<section class="tab" id="t-prep"></section>
+<section class="tab" id="t-grocery"></section>
+</main>
+<nav><div>
+<button data-tab="today" class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Today</button>
+<button data-tab="meals"><svg viewBox="0 0 24 24"><path d="M4 11h16a8 8 0 0 1-16 0zM9 21h6M8 4c-1 2 1 2 0 4M12 3c-1 2 1 3 0 5M16 4c-1 2 1 2 0 4"/></svg>Meals</button>
+<button data-tab="prep"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/><path d="M16 18l2 2 3-4"/></svg>Sunday Prep</button>
+<button data-tab="grocery"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.5 11h10L20 7H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>Grocery</button>
+</div></nav>
+<script>
+/* ---------- data ---------- */
+const TARGET={k:3200,p:195,c:425,f:80};
+// per 100 g (or 100 ml): [name, kcal, protein, carbs, fat, unit]
+const FOOD={
+ricecake:['Rice cakes, plain',368,10.5,79,5.3],
+banana:['Banana',89,1.1,22.8,0.3],
+honey:['Honey',304,0.3,82.4,0],
+egg:['Large eggs',143,12.4,1,10],
+oil:['Extra virgin olive oil',884,0,0,100],
+sourdough:['Sourdough bread',263,10.1,52.5,1.5],
+spread:['Raspberry-habanero spread (or good jam)',222,0.5,55.5,0],
+oj:['Orange juice, no pulp',46,0.8,10.8,0,'ml'],
+berries:['Frozen mixed berries',52,0.8,12.5,0.3],
+maple:['Maple syrup',260,0,67,0],
+compote:['Berry compote',59,0.7,14.3,0.3],
+vyog:['Vanilla Greek yogurt, 0% (Oikos Pro)',57,10.3,4,0],
+yog:['Plain Greek yogurt, 0%',57,9.7,3.4,0],
+granola:['Granola',473,10.9,65.5,18.2],
+chicken:['Chicken breast, raw',120,22.5,0,2.6],
+rice:['Basmati rice, dry',356,8,78,1],
+broccoli:['Frozen broccoli florets',28,3,5.3,0.2],
+soy:['Soy sauce',53,8.1,4.9,0.6],
+cucumber:['Cucumber',15,0.7,3.6,0.1],
+redonion:['Red onion',40,1.1,9.3,0.1],
+onion:['White onion',40,1.1,9.3,0.1],
+pickle:['Cucumber-onion pickle',21,0.8,4.9,0.1],
+bagel:['Sesame bagel',300,11.3,48.8,6.3],
+pb:['Natural peanut butter',600,26.7,20,46.7],
+apple:['Apple',55,0.1,14.8,0.2],
+sockeye:['Sockeye salmon fillet, raw',136,22.3,0,4.9],
+potato:['Little yellow potatoes',74,2,17.5,0.1],
+miso:['White miso',198,12.8,25.4,6],
+glaze:['Miso-maple glaze',180,7.4,32.2,2.9],
+sesame:['Sesame seeds',573,17.7,23.4,49.7],
+skyr:['Plain skyr, 0%',54,9.5,4,0],
+beef:['Extra lean ground beef, raw',176,20,0,10],
+tomato:['Roma tomato',18,0.9,3.9,0.2],
+romaine:['Romaine lettuce',17,1.2,3.3,0.3],
+lemonj:['Lemon juice',22,0.4,6.9,0.2]
+};
+const I=(f,g,q,u,note)=>({f,g,q,u,note});
+const S=(n,q,u,note)=>({n,q,u,note});
+const RECIPES=[
+{id:'pre',tag:'Pre-workout',name:'Honey-Banana Rice Cakes with Cinnamon & Flaky Salt',time:'3 min',serv:1,
+ ing:[I('ricecake',19,2,'rice cakes'),I('banana',120,1,'medium'),I('honey',14,2,'tsp'),S('Cinnamon',null,'pinch'),S('Flaky salt',null,'pinch')],
+ steps:['Mash half the banana onto the rice cakes with a fork. Slice the rest on top. (1 min)','Drizzle with the honey, then dust with cinnamon and a few flakes of salt. The salt is what makes it taste like more than a snack. (1 min)','Eat by 5:15 so it has settled before you start training.'],
+ prep:'Nothing to prep. Keep bananas at different stages of ripeness so one is ready each morning.'},
+{id:'bfast',tag:'Post-workout breakfast',name:'Soft-Scrambled Eggs on Sourdough with Raspberry-Habanero Toast',time:'8 min',serv:1,
+ ing:[I('egg',150,3,'large'),I('oil',4.5,1,'tsp'),I('sourdough',99,2,'slices'),I('spread',24,4,'tsp'),I('oj',200,200,'ml','a small glass'),S('Green onion, thinly sliced',1,'tbsp'),S('Kosher salt',null,'pinch'),S('Black pepper',null,'to taste')],
+ steps:['Toast the sourdough. Whisk the eggs with a pinch of salt until no streaks remain. (1 min)','Warm the oil in a pan over medium-low heat. Pour in the eggs and stir slowly with a spatula, scraping the bottom, for about 2 minutes. Low heat and constant movement give small, creamy curds.','Pull the pan off the heat while the eggs still look slightly glossy. They finish cooking on the toast.','Pile the eggs on one slice with green onion and plenty of pepper. Spread the raspberry-habanero on the other slice. Serve with the orange juice.'],
+ prep:'Slice the green onions on Sunday and keep them in a small jar lined with paper towel (5 days).'},
+{id:'yog',tag:'Morning snack',name:'Vanilla Yogurt Crunch Bowl with Berry Compote',time:'2 min',serv:1,
+ ing:[I('vyog',215,0.9,'cup'),I('granola',40,0.33,'cup'),I('compote',75,0.33,'cup','from the Sunday batch'),S('Lemon zest',null,'pinch','optional')],
+ steps:['Spoon the yogurt into a jar or bowl and top with the compote and a little lemon zest.','Keep the granola separate until you eat so it stays crunchy.'],
+ prep:'Sunday: portion 7 bags or jars of granola (40 g each). Build the yogurt and compote jars up to 3 days ahead.'},
+{id:'lunch',tag:'Lunch',name:'Hot Honey-Garlic Chicken Bowls with Golden Basmati & Charred Broccoli',time:'50 min for the batch',serv:7,
+ ing:[I('chicken',160,0.75,'breast'),I('rice',80,0.43,'cup'),I('broccoli',150,1.5,'cups'),I('oil',9,2,'tsp'),I('honey',10,1.5,'tsp'),I('soy',5,1,'tsp'),I('yog',40,2.5,'tbsp'),I('pickle',65,0.25,'cup','from the Sunday batch'),S('Garlic, finely grated',1,'clove'),S('Sriracha or hot sauce',1,'tsp','or ¼ tsp chili flakes'),S('Rice vinegar',0.5,'tsp'),S('Smoked paprika',0.5,'tsp'),S('Turmeric',0.125,'tsp'),S('Kosher salt',0.5,'tsp'),S('Lime',0.25,'lime')],
+ steps:['Heat the oven to 425°F (220°C) with two sheet pans inside. Slice each chicken breast in half horizontally so the pieces are an even thickness. Toss with half the oil, the smoked paprika and half the salt. (5 min)','Rice: rinse the basmati until the water runs clear. Put it in a pot with 1.5 times its weight in water, the turmeric and the rest of the salt. Bring to a boil, cover, and cook on the lowest heat for 12 minutes. Take it off the heat and leave it covered for 10 minutes, then fluff. (25 min, unattended)','Roast the chicken on a hot pan for 14 minutes. Meanwhile stir together the honey, soy sauce, garlic, hot sauce and rice vinegar.','Brush the glaze over the chicken and roast 3–4 minutes more, until it is sticky and 165°F (74°C) in the thickest part. Rest 10 minutes, then slice.','Broccoli: toss the frozen florets with the remaining oil and a pinch of salt. Roast on the second hot pan for 15–18 minutes, until the tips char.','Stir the yogurt with lime juice and a pinch of salt. Build each bowl with rice, chicken and broccoli. Add the pickle and lime yogurt after reheating.'],
+ prep:'Sunday: cook all 7. Keep 3 in the fridge (through Wednesday) and freeze 3 without the pickle or yogurt. Move a frozen bowl to the fridge the night before. Reheat 2–2½ minutes with a splash of water.'},
+{id:'bagel',tag:'Afternoon snack',name:'Toasted Sesame Bagel with Peanut Butter, Apple & Cinnamon',time:'4 min',serv:1,
+ ing:[I('bagel',80,1,'bagel'),I('pb',20,4,'tsp'),I('apple',180,1,'medium'),S('Cinnamon',null,'pinch'),S('Flaky salt',null,'pinch')],
+ steps:['Toast the bagel well so it stays crisp under the peanut butter. (3 min)','Spread with the peanut butter. Fan half the apple, thinly sliced, on top and finish with cinnamon and flaky salt.','Eat the rest of the apple on the side.'],
+ prep:'Sunday: slice the bagels and freeze them. They toast straight from frozen. For work, toast at home in the morning or use the office toaster.'},
+{id:'salmon',tag:'Dinner · Tue, Thu, Sat',name:'Miso-Maple Sockeye with Crispy Smashed Potatoes & Sesame Broccoli',time:'35 min',serv:1,
+ ing:[I('sockeye',170,1,'fillet'),I('potato',300,10,'little potatoes'),I('broccoli',150,1.5,'cups'),I('glaze',35,2,'tbsp','from the Sunday jar'),I('oil',9,2,'tsp'),I('sesame',3,1,'tsp'),S('Green onion, sliced',1,'stalk'),S('Lemon',0.25,'lemon'),S('Kosher salt',0.25,'tsp')],
+ steps:['Heat the oven to 450°F (230°C) with a sheet pan inside. If the potatoes are not par-boiled, boil them whole in salted water for 12–15 minutes until tender, then drain. (Skip this on Tuesday and Thursday: Sunday\'s potatoes are ready.)','Tip the potatoes onto the hot pan and smash each one flat with the bottom of a glass. Drizzle with most of the oil, salt them, and roast for 25 minutes until deeply crisp at the edges.','After 10 minutes, toss the frozen broccoli with the last of the oil and add it to the pan.','Set aside 1 teaspoon of glaze for the broccoli. Pat the salmon dry, set it skin-side down on a small parchment-lined tray and brush with half the remaining glaze.','When the potatoes have 8 minutes left, put the salmon in the oven. Roast 6–7 minutes, brush with the rest of the glaze, and broil 1 minute until it bubbles. Sockeye is lean, so pull it at 125°F (52°C) for medium, or 145°F (63°C) if you prefer it cooked through.','Toss the broccoli with the reserved glaze and the sesame seeds. Plate with green onion and a squeeze of lemon.'],
+ prep:'Sunday: par-boil the potatoes for Tuesday and Thursday and mix the glaze. Thaw each fillet in the fridge the night before. Saturday\'s potatoes come from the small batch you boil on Thursday.'},
+{id:'taco',tag:'Dinner · Sun, Mon, Wed, Fri',name:'Street Taco Beef Bowl with Crispy Little Potatoes, Pico & Lime Crema',time:'35 min',serv:2,
+ ing:[I('beef',227,0.5,'lb'),I('potato',300,10,'little potatoes'),I('oil',5,1,'tsp'),I('tomato',100,1,'roma'),I('onion',20,2,'tbsp','finely diced'),I('yog',50,3,'tbsp'),I('romaine',50,1,'cup','shredded'),S('Garlic, finely grated',1,'clove'),S('Chili powder',1,'tsp'),S('Ground cumin',0.5,'tsp'),S('Smoked paprika',0.5,'tsp'),S('Dried oregano',0.25,'tsp'),S('Kosher salt',0.75,'tsp'),S('Lime',0.5,'lime'),S('Cilantro, chopped',1,'tbsp'),S('Hot sauce',null,'to taste')],
+ steps:['Heat the oven to 450°F (230°C) with a sheet pan inside. Halve the par-boiled potatoes, toss with the oil and a third of the salt, and roast cut-side down for 22–25 minutes until crisp.','Pico: dice the tomato and mix with half the onion, the cilantro, a squeeze of lime and a pinch of salt. Let it sit while you cook. (3 min)','Heat a stainless pan over medium-high until a drop of water skates across it. Press the beef into the pan in one layer and leave it alone for 3–4 minutes to build a dark crust.','Break the beef up. Add the rest of the onion, the garlic, all the spices and the remaining salt. Cook 2 minutes, then add 2 tablespoons of water and a squeeze of lime per serving so it turns saucy. Cook to 160°F (71°C).','Crema: stir the yogurt with a squeeze of lime and a pinch of salt.','Build the bowl with romaine, potatoes and beef, then the pico, crema and hot sauce.'],
+ prep:'Sunday: cook 4 servings of the beef. Keep 2 in the fridge (Sunday and Monday) and freeze 2 (Wednesday and Friday; thaw in the fridge the night before). Reheat the beef in a pan with a splash of water. Roast potatoes for two nights at a time. They re-crisp in a 425°F oven or air fryer in 8 minutes. Make pico fresh every second night.'},
+{id:'skyr',tag:'Before bed',name:'Honey-Vanilla Skyr with Warm Berry Compote',time:'2 min',serv:1,
+ ing:[I('skyr',200,0.85,'cup'),I('compote',75,0.33,'cup','from the Sunday batch'),I('honey',7,1,'tsp'),S('Vanilla extract',0.25,'tsp'),S('Cinnamon',null,'pinch')],
+ steps:['Stir the vanilla and honey into the skyr.','Warm the compote for 30 seconds in the microwave and spoon it over the top. Finish with cinnamon.'],
+ prep:'Uses the Sunday compote. Nothing else to prep.'},
+{id:'pregame',tag:'Monday pre-game',name:'Pre-Game Peanut Butter-Banana Bagel',time:'4 min',serv:1,
+ ing:[I('bagel',80,1,'bagel'),I('pb',15,1,'tbsp'),I('banana',120,1,'medium'),S('Cinnamon',null,'pinch'),S('Flaky salt',null,'pinch')],
+ steps:['Toast the bagel. Spread with the peanut butter and top with sliced banana, cinnamon and flaky salt.','Finish eating by 5:30 so you have 90 minutes before tip-off. It is mostly carbs with little fibre, so it sits light on the court.'],
+ prep:'Uses the bagels frozen on Sunday.'},
+{id:'drink',tag:'Monday, during the game',name:'Honey-Lemon Sports Drink',time:'2 min',serv:1,
+ ing:[S('Water',500,'ml'),I('honey',21,1,'tbsp'),I('lemonj',15,1,'tbsp'),S('Fine pink Himalayan salt',0.125,'tsp'),S('NuSalt',null,'pinch','optional, for potassium')],
+ steps:['Dissolve the honey and salt in a splash of warm water in your bottle.','Add the lemon juice and the rest of the water, cold. Shake.','Drink water in the first hour and sip this through the second hour.'],
+ prep:'Mix it before you leave for the gym. Keep NuSalt to a pinch.'},
+{id:'skyrmon',tag:'Monday post-game',name:'Post-Game Honey Skyr',time:'1 min',serv:1,
+ ing:[I('skyr',200,0.85,'cup'),I('honey',7,1,'tsp'),S('Cinnamon',null,'pinch')],
+ steps:['Stir the honey into the skyr and dust with cinnamon. Eat it right after the beef bowl.'],
+ prep:'Nothing to prep.'},
+{id:'compote',tag:'Sunday batch',name:'Maple-Lemon Berry Compote',time:'15 min',serv:7,per:'day (150 g)',
+ ing:[I('berries',145,1,'cup'),I('maple',5,0.75,'tsp'),I('lemonj',5,1,'tsp'),S('Kosher salt',null,'pinch')],
+ steps:['Put the frozen berries, maple syrup and salt in a pot over medium heat. Simmer 12–15 minutes, stirring now and then, until the juices turn syrupy.','Stir in the lemon juice off the heat. Cool, then jar.'],
+ prep:'One batch covers the yogurt bowl and the bedtime skyr for 7 days. Keeps 7 days in the fridge.'},
+{id:'picklebatch',tag:'Sunday batch',name:'Quick Cucumber-Onion Pickle',time:'5 min',serv:7,
+ ing:[I('cucumber',50,0.33,'cup','thinly sliced'),I('redonion',15,2,'tbsp','thinly sliced'),S('Rice vinegar',2,'tsp'),S('Sugar',0.125,'tsp'),S('Kosher salt',0.125,'tsp')],
+ steps:['Slice the cucumber and red onion as thinly as you can.','Toss with the vinegar, sugar and salt in a jar. It is ready in 15 minutes and gets better by day two.'],
+ prep:'Keeps 7 days in the fridge. Pack it in a small container beside each lunch.'},
+{id:'glazebatch',tag:'Sunday batch',name:'Miso-Maple Glaze',time:'3 min',serv:3,
+ ing:[I('miso',17,1,'tbsp'),I('maple',10,1.5,'tsp'),I('soy',5,1,'tsp'),S('Rice vinegar',0.5,'tsp'),S('Fresh ginger, grated',0.25,'tsp')],
+ steps:['Whisk everything together in a small jar until smooth.'],
+ prep:'Makes enough for the three salmon nights. Keeps 2 weeks in the fridge.'}
+];
+const DAYNAMES=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DINNER=['taco','taco','salmon','taco','salmon','taco','salmon'];
+function plan(d){
+ const M=(t,id,note)=>({t,id,note}),K=(t,label)=>({t,label});
+ const wk=d>=1&&d<=5,s=[K('5:00 AM','Wake up'),M('5:10 AM','pre'),K('5:30 AM','At the gym. Train.'),M('7:15 AM','bfast','Home from the gym')];
+ if(wk)s.push(K('8:30 AM','Work'));
+ if(d===0)s.push(K('10:00 AM','Sunday prep, about 2¼ hours'));
+ s.push(M('10:15 AM','yog'),M('1:00 PM','lunch',wk?'Lunch break':d===0?'Straight from the prep batch':''));
+ if(d===1){s.push(K('5:00 PM','Finish work'),M('5:15 PM','pregame','Done by 5:30'),M('7:00 PM','drink','Basketball 7–9 PM. Sip through the second hour.'),M('9:00 PM','taco','Reheat Sunday\'s beef and re-crisp the potatoes'),M('9:20 PM','skyrmon'),K('10:15 PM','Lights out'));}
+ else{s.push(M('3:30 PM','bagel'));if(wk)s.push(K('5:00 PM','Finish work'));
+  s.push(M('6:00 PM',DINNER[d],d===5?'Thawed beef from the Sunday batch. Re-crisp Wednesday\'s potatoes.':d===0?'Beef from this morning\'s prep. Roast potatoes for tonight and Monday.':d===3?'Thawed beef from the Sunday batch. Roast potatoes for tonight and Friday.':''),M('8:15 PM','skyr'),K('9:00 PM','Lights out'));}
+ return s;
+}
+const PREP=[
+['0:00','Oven on, rice on','Heat the oven to 425°F (220°C) with two sheet pans inside. Rinse 560 g basmati and start it with 840 ml water, turmeric and salt. It runs unattended for 25 minutes.'],
+['0:05','Season the chicken','Halve 1.1 kg chicken breasts horizontally. Toss with oil, smoked paprika and salt.'],
+['0:10','Par-boil potatoes','Boil 1.5 kg little potatoes in salted water for 12 minutes. Unattended. This covers dinners from Sunday through Thursday.'],
+['0:15','Start the compote','1 kg frozen berries, 5 tsp maple syrup and a pinch of salt in a pot. Simmer 15 minutes, stirring now and then.'],
+['0:20','Chicken in the oven','Roast 14 minutes on a hot pan. Unattended. Mix the hot honey-garlic glaze while it cooks.'],
+['0:25','Drain potatoes, make the pickle','Drain the potatoes and let them steam dry. Slice 1 cucumber and 1 red onion, and toss with vinegar, sugar and salt in a jar.'],
+['0:35','Glaze the chicken','Brush on the glaze and roast 3–4 minutes more, to 165°F (74°C). Rest it 10 minutes. Take the compote off the heat and add the lemon juice.'],
+['0:40','Broccoli in the oven','Toss 1 kg frozen broccoli with oil and salt. Roast on both hot pans for 15–18 minutes. Unattended.'],
+['0:45','Cook the taco beef','Sear 2 packs (900 g) extra lean ground beef in two batches so it browns instead of steaming. Add onion, garlic and spices, then water and lime. About 20 minutes in total.'],
+['1:05','Mix the miso-maple glaze','Whisk 3 tbsp miso, 1½ tbsp maple syrup, 1 tbsp soy sauce, 1½ tsp rice vinegar and a little grated ginger in a jar.'],
+['1:10','Slice and portion lunches','Slice the chicken and fluff the rice. Build 7 bowls. Eat one for lunch, put 3 in the fridge and 3 in the freezer.'],
+['1:30','Portion the beef','Split into 4 servings. Put 2 in the fridge and 2 in the freezer.'],
+['1:40','Small jobs','Portion 7 bags of granola (40 g each). Slice the green onions. Slice and freeze the bagels. Jar the compote. Box the potatoes.'],
+['1:55','Clean up','Wash the pans and wipe down. Done in about 2¼ hours.']
+];
+const KEEPS=[
+['Chicken and rice bowls','4 days','3 months'],['Taco beef','4 days','3 months'],['Par-boiled potatoes','4 days','Not recommended'],
+['Berry compote','7 days','3 months'],['Cucumber-onion pickle','7 days','No'],['Miso-maple glaze','2 weeks','No'],
+['Roasted broccoli (in the bowls)','4 days','3 months'],['Sliced bagels and sourdough','2 days on the counter','3 months'],['Sliced green onions','5 days','No']
+];
+const WEEK=[
+['Monday night','Sockeye for Tuesday: move one fillet from the freezer to the fridge.'],
+['Tuesday night','Move one serving of taco beef from the freezer to the fridge for Wednesday.'],
+['Wednesday night','Move Thursday\'s lunch bowl and one sockeye fillet to the fridge.'],
+['Thursday night','Boil 600 g potatoes for Friday and Saturday (12–15 min). Move Friday\'s lunch bowl and the last serving of taco beef to the fridge.'],
+['Friday night','Move Saturday\'s lunch bowl and one sockeye fillet to the fridge.']
+];
+const GROCERY=[
+['Produce',45,[['Bananas','8'],['Apples','6 medium'],['Little yellow potatoes','2.1 kg (three 680 g bags)'],['Roma tomatoes','4'],['Romaine heart','1'],['English cucumber','1'],['Red onion','1'],['White onion','1 small'],['Garlic','1 head'],['Limes','4'],['Lemons','2'],['Green onions','1 bunch'],['Cilantro','1 bunch'],['Fresh ginger','1 small piece']]],
+['Meat and fish',40,[['Chicken breasts, boneless skinless','1.1 kg (about 5)'],['Extra lean ground beef','2 packs (454 g each)']]],
+['Dairy and eggs',60,[['Large brown eggs','2 dozen (uses 21)'],['Vanilla Greek yogurt, 0% (Oikos Pro)','1.5 kg'],['Plain Greek yogurt, 0%','500 g'],['Plain skyr, 0%','1.5 kg (two 750 g tubs)'],['Orange juice, no pulp','1.75 L (uses 1.4 L)']]],
+['Bakery',23,[['Sourdough loaf, sliced','14 slices (about 700 g)'],['Sesame bagels','7 (two 6-packs; freeze the extras)']]],
+['Pantry',20,[['Basmati rice','560 g'],['Plain rice cakes','14 (1 bag)'],['Granola','280 g (1 bag)'],['Honey','250 g']]],
+['Frozen',47,[['Mixed berries','1 kg'],['Broccoli florets','1.5 kg'],['Wild sockeye salmon fillets','3 (about 170 g each)']]],
+['Staples to check (buy once)',55,[['Natural peanut butter',''],['Extra virgin olive oil',''],['Maple syrup',''],['White miso',''],['Soy sauce',''],['Rice vinegar',''],['Sesame seeds',''],['Sriracha or hot sauce',''],['Raspberry-habanero spread or jam',''],['Smoked paprika, chili powder, cumin, oregano, turmeric, cinnamon',''],['Vanilla extract',''],['Kosher salt, flaky salt, pink salt, black pepper','']]]
+];
+/* ---------- maths ---------- */
+function macros(r,s){s=s||1;const m={k:0,p:0,c:0,f:0};r.ing.forEach(i=>{if(!i.f||!i.g)return;const d=FOOD[i.f],x=i.g*s/100;m.k+=d[1]*x;m.p+=d[2]*x;m.c+=d[3]*x;m.f+=d[4]*x});return m}
+const R={};RECIPES.forEach(r=>R[r.id]=r);
+function dayTotal(d,only){const m={k:0,p:0,c:0,f:0};plan(d).forEach((s,i)=>{if(!s.id||(only&&!only[i]))return;const x=macros(R[s.id]);for(const k in m)m[k]+=x[k]});return m}
+function frac(x){if(x>=20)return String(Math.round(x));let w=Math.floor(x+1e-9),r=x-w,best=0,bd=9;const F=[[0,''],[.125,'⅛'],[.25,'¼'],[.333,'⅓'],[.5,'½'],[.667,'⅔'],[.75,'¾'],[1,'']];F.forEach((f,i)=>{const d=Math.abs(r-f[0]);if(d<bd){bd=d;best=i}});if(best===7){w++;best=0}if(w===0&&best===0)return'⅛';return(w?w:'')+F[best][1]}
+function house(q,u){if(q==null)return u;if(u==='tsp'&&q>=3){q/=3;u='tbsp'}if(u==='tbsp'&&q>=4){q/=16;u='cup'}if(u==='cup'&&q>1.01)u='cups';const PL={clove:'cloves',breast:'breasts',stalk:'stalks',lime:'limes',lemon:'lemons',fillet:'fillets',bagel:'bagels',roma:'romas'};if(PL[u]&&q>1.01)u=PL[u];if(u==='cups'&&q<=1.01)u='cup';return frac(q)+' '+u}
+function grams(g){return g>=10?Math.round(g):Math.round(g*10)/10}
+if(typeof module!=='undefined')module.exports={RECIPES,R,macros,dayTotal,plan,TARGET,house,DAYNAMES};
+/* ---------- app ---------- */
+if(typeof document!=='undefined'){(function(){
+const mem={};
+const store={get(k,d){try{const v=localStorage.getItem('mp.'+k);return v?JSON.parse(v):(k in mem?mem[k]:d)}catch(e){return k in mem?mem[k]:d}},set(k,v){mem[k]=v;try{localStorage.setItem('mp.'+k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const $=id=>document.getElementById(id);
+const n0=x=>Math.round(x).toLocaleString('en-CA');
+const now=new Date(),todayIdx=now.getDay(),stamp=now.toDateString();
+let day=todayIdx;
+// eaten checks: one record per weekday, cleared when it is from an earlier week
+let eaten=store.get('eaten',{});
+for(const k in eaten){const e=eaten[k],age=(now-new Date(e.stamp))/864e5;if(!e.stamp||age>6||(+k===todayIdx&&e.stamp!==stamp))delete eaten[k]}
+let servings=store.get('servings',{}),open={},prepOn=store.get('prep',{}),weekOn=store.get('week',{}),grocOn=store.get('groc',{});
+const macLine=m=>`<b>${n0(m.k)}</b> kcal · <b>${n0(m.p)}</b> g protein · <b>${n0(m.c)}</b> g carbs · <b>${n0(m.f)}</b> g fat`;
+function renderToday(){
+ const slots=plan(day),chk=(eaten[day]||{}).c||{},tot=dayTotal(day),got=dayTotal(day,chk);
+ const bar=(label,v,t,col,unit)=>`<div><span>${label}</span><b>${n0(v)}</b><span>of ${n0(t)}${unit}</span><div class="bar"><i style="width:${Math.min(100,v/t*100)}%;background:var(${col})"></i></div></div>`;
+ let h=`<h1>${DAYNAMES[day]}</h1><p class="sub">${day===todayIdx?'Today':'Preview'} · ${day===1?'Basketball night, 7–9 PM':DINNER[day]==='salmon'?'Salmon night':'Beef bowl night'}</p>
+ <div class="days">${DAYNAMES.map((d,i)=>`<button data-day="${i}" class="${i===day?'on':''} ${i===todayIdx?'today':''}" aria-label="${d}">${d.slice(0,3)}</button>`).join('')}</div>
+ <div class="card"><div class="row"><div><div class="big">${n0(got.k)}</div><div class="sub">of ${n0(TARGET.k)} kcal eaten</div></div><div class="sub" style="text-align:right">${n0(Math.max(0,TARGET.k-got.k))} kcal left<br>Plan for today: ${n0(tot.k)}</div></div>
+ <div class="bar" style="height:10px;margin-top:10px"><i style="width:${Math.min(100,got.k/TARGET.k*100)}%"></i></div>
+ <div class="mgrid">${bar('Protein',got.p,TARGET.p,'--p',' g')}${bar('Carbs',got.c,TARGET.c,'--c',' g')}${bar('Fat',got.f,TARGET.f,'--f',' g')}</div></div>
+ <div class="card">`;
+ slots.forEach((s,i)=>{
+  if(!s.id){h+=`<div class="slot mark"><div class="time">${s.t}</div><div class="body"><div class="name">${esc(s.label)}</div></div></div>`;return}
+  const r=R[s.id],m=macros(r);
+  h+=`<div class="slot ${chk[i]?'done':''}"><div class="time">${s.t}</div><div class="body"><div class="name">${esc(r.name)}</div>${s.note?`<div class="mac">${esc(s.note)}</div>`:''}<div class="mac">${macLine(m)}</div><button class="link" data-recipe="${r.id}">View recipe</button></div><button class="chk" data-eat="${i}" role="checkbox" aria-checked="${!!chk[i]}" aria-label="Mark ${esc(r.name)} as eaten">✓</button></div>`});
+ h+=`</div><p class="sub">Day's plan: ${macLine(tot)}. Targets: ${n0(TARGET.k)} kcal, ${TARGET.p} g protein, ${TARGET.c} g carbs, ${TARGET.f} g fat.</p>`;
+ $('t-today').innerHTML=h;
+}
+function renderMeals(){
+ let h='<h1>Meals</h1><p class="sub">Tap a recipe to open it. Change the servings and every ingredient scales.</p>';
+ RECIPES.forEach(r=>{
+  const s=servings[r.id]||r.serv,m=macros(r);
+  h+=`<div class="card ${open[r.id]?'open':''}" id="r-${r.id}"><button class="rhead" data-open="${r.id}" aria-expanded="${!!open[r.id]}"><div><span class="tag">${esc(r.tag)}</span><div class="name">${esc(r.name)}</div><div class="mac">${macLine(m)} per ${r.per||'serving'}</div></div><span class="arrow">${open[r.id]?'–':'+'}</span></button><div class="rbody">
+  <div class="step"><button data-serv="${r.id}" data-d="-1" aria-label="Fewer servings">−</button><div class="n">${s} ${s===1?'serving':'servings'}<small>${esc(r.time)}${s>1?' · total '+n0(m.k*s)+' kcal':''}</small></div><button data-serv="${r.id}" data-d="1" aria-label="More servings">+</button></div>
+  <h3>Ingredients</h3>`;
+  r.ing.forEach(i=>{
+   const name=i.f?FOOD[i.f][0]:i.n,unit=i.f&&FOOD[i.f][5]||'g';
+   const hq=i.q==null?i.u:(i.u==='ml'?n0(i.q*s)+' ml':house(i.q*s,i.u));
+   const q=i.g&&i.u!=='ml'?`<b>${grams(i.g*s)} ${unit}</b> · ${esc(hq)}`:`<b>${esc(hq)}</b>`;
+   h+=`<div class="ing"><div>${esc(name)}${i.note?`<small>${esc(i.note)}</small>`:''}</div><div class="q">${q}</div></div>`});
+  h+=`<h3>Method</h3><ol>${r.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><div class="note"><b>Prep:</b> ${esc(r.prep)}</div></div></div>`});
+ $('t-meals').innerHTML=h;
+}
+const item=(k,key,on,title,detail,when)=>`<button class="item ${on?'on':''}" data-${k}="${key}" role="checkbox" aria-checked="${!!on}"><span class="chk">✓</span><span class="body">${when?`<span class="when">${esc(when)}</span><br>`:''}<span class="t">${esc(title)}</span>${detail?`<div class="d">${esc(detail)}</div>`:''}</span></button>`;
+function renderPrep(){
+ const done=PREP.filter((p,i)=>prepOn[i]).length;
+ let h=`<h1>Sunday Prep</h1><p class="sub">About 2¼ hours for one person. Start at 10:00 AM and lunch comes straight out of the batch at 1:00.</p>
+ <div class="row"><h2>Timeline · ${done} of ${PREP.length} done</h2><button class="reset" data-reset="prep">Reset</button></div><div class="card">${PREP.map((p,i)=>item('prep',i,prepOn[i],p[1],p[2],p[0])).join('')}</div>
+ <h2>How long it keeps</h2><div class="card"><table><tr><th>Item</th><th>Fridge</th><th>Freezer</th></tr>${KEEPS.map(k=>`<tr><td>${esc(k[0])}</td><td>${k[1]}</td><td>${k[2]}</td></tr>`).join('')}</table></div>
+ <div class="row"><h2>During the week</h2><button class="reset" data-reset="week">Reset</button></div><div class="card">${WEEK.map((w,i)=>item('week',i,weekOn[i],w[1],'',w[0])).join('')}</div>`;
+ $('t-prep').innerHTML=h;
+}
+function renderGrocery(){
+ const all=GROCERY.reduce((a,s)=>a+s[2].length,0),got=Object.keys(grocOn).filter(k=>grocOn[k]).length;
+ const week=GROCERY.slice(0,6).reduce((a,s)=>a+s[1],0);
+ let h=`<h1>Grocery</h1><p class="sub">One week, sized to the Sunday prep. Rough cost: about $${week} a week, plus about $${GROCERY[6][1]} once for staples you don't already have.</p>
+ <div class="row"><h2>${got} of ${all} in the cart</h2><button class="reset" data-reset="groc">Reset</button></div>`;
+ GROCERY.forEach((s,si)=>{h+=`<div class="row"><h3>${esc(s[0])}</h3><span class="sub">about $${s[1]}</span></div><div class="card">${s[2].map((g,gi)=>item('groc',si+'-'+gi,grocOn[si+'-'+gi],g[0],g[1])).join('')}</div>`});
+ $('t-grocery').innerHTML=h;
+}
+const renders={today:renderToday,meals:renderMeals,prep:renderPrep,grocery:renderGrocery};
+function show(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='t-'+tab));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));renders[tab]();store.set('tab',tab)}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.tab){show(d.tab);window.scrollTo(0,0)}
+ else if(d.day){day=+d.day;renderToday()}
+ else if(d.eat){const rec=eaten[day]||{c:{}};rec.c[d.eat]=!rec.c[d.eat];rec.stamp=stamp;eaten[day]=rec;store.set('eaten',eaten);renderToday()}
+ else if(d.recipe){open[d.recipe]=true;show('meals');const el=$('r-'+d.recipe);if(el)el.scrollIntoView({block:'start'});window.scrollBy(0,-12)}
+ else if(d.open){open[d.open]=!open[d.open];renderMeals()}
+ else if(d.serv){const r=R[d.serv],s=Math.max(1,Math.min(14,(servings[r.id]||r.serv)+(+d.d)));servings[r.id]=s;store.set('servings',servings);renderMeals()}
+ else if(d.prep!==undefined){prepOn[d.prep]=!prepOn[d.prep];store.set('prep',prepOn);renderPrep()}
+ else if(d.week!==undefined){weekOn[d.week]=!weekOn[d.week];store.set('week',weekOn);renderPrep()}
+ else if(d.groc!==undefined){grocOn[d.groc]=!grocOn[d.groc];store.set('groc',grocOn);renderGrocery()}
+ else if(d.reset){if(d.reset==='prep'){prepOn={};store.set('prep',prepOn);renderPrep()}if(d.reset==='week'){weekOn={};store.set('week',weekOn);renderPrep()}if(d.reset==='groc'){grocOn={};store.set('groc',grocOn);renderGrocery()}}
+});
+const first=store.get('tab','today');show(renders[first]?first:'today');
+// iOS wants a PNG home-screen icon, so draw one from the inline SVG
+try{const l=$('touchicon'),img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=180;c.getContext('2d').drawImage(img,0,0,180,180);l.href=c.toDataURL('image/png')}catch(e){}};img.src=l.href}catch(e){}
+})()}
+</script>
+</body>
+</html>
